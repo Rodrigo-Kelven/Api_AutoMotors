@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concessionária de Automóveis</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        form { margin: 20px; }
+        img { max-width: 200px; }
+        .carro { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Adicionar Carro</h1>
+    <form id="carForm" enctype="multipart/form-data">
+        <input type="text" name="modelo" placeholder="Modelo" required>
+        <input type="number" name="ano" placeholder="Ano" required>
+        <input type="number" name="preco" placeholder="Preço" required>
+        <input type="file" name="imagem" required>
+        <button type="submit">Adicionar Carro</button>
+    </form>
+    
+    <h2>Carros Adicionados</h2>
+    <div id="carros"></div>
+
+    <script>
+        document.getElementById('carForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const response = await fetch('/carros/', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            addCarroToDOM(data);
+            e.target.reset();
+        };
+
+        async function loadCarros() {
+            const response = await fetch('/carros/');
+            const carros = await response.json();
+            carros.forEach(addCarroToDOM);
+        }
+
+        function addCarroToDOM(carro) {
+            document.getElementById('carros').innerHTML += `
+                <div class="carro">
+                    <h3>${carro.modelo}</h3>
+                    <p>Ano: ${carro.ano}</p>
+                    <p>Preço: R$ ${carro.preco}</p>
+                    <img src="${carro.imagem}" alt="${carro.modelo}">
+                </div>
+            `;
+        }
+
+        // Carregar carros ao iniciar a página
+        loadCarros();
+    </script>
+</body>
+</html
