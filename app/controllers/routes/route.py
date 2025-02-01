@@ -60,6 +60,10 @@ async def get_carros():
 # Rota GET para renderizar o template HTML
 @router.get(
         path="/",
+        status_code=status.HTTP_200_OK,
+        response_description="Renderizaçao pag",
+        description="Renderizacao pag",
+        name="Renderizacao pag",
         response_class=HTMLResponse
 )
 async def read_root(request: Request):
