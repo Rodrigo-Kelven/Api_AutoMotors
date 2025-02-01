@@ -1,8 +1,8 @@
+# app/models/models.py
+from sqlalchemy import Column, Integer, String
 from app.database.database import Base
-from sqlalchemy import create_engine, Column, Integer, String
 
-
-# Modelo de dados para o carro
+# tabela que será criada no db
 class Carro(Base):
     __tablename__ = "carros"
 

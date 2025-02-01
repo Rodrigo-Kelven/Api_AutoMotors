@@ -48,7 +48,7 @@
                 <div class="carro">
                     <h3>${carro.modelo}</h3>
                     <p>Ano: ${carro.ano}</p>
-                    <p>Preço: R$ ${carro.preco}</p>
+                    <p>Preço: R$ ${carro.preco.toFixed(2)}</p>
                     <img src="${carro.imagem}" alt="${carro.modelo}">
                 </div>
             `;
@@ -58,4 +58,4 @@
         loadCarros();
     </script>
 </body>
-</html
+</html>
