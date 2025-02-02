@@ -29,6 +29,9 @@ os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 async def create_carro(
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
     Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
+    Kilometros: float = Form(...),
+    Cor: str = Form(...),
+    Combustivel: str = Form(...),
     Preco: float = Form(..., title="Preço do veiculo", alias="Preco", description="Preço do veiculo"),
     Descricao: str = Form(..., title="Descriçao do veiculo", alias="Descricao", description="Descricao do veiculo"),
     Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo")
@@ -38,7 +41,7 @@ async def create_carro(
         file_object.write(await Imagem.read())
     
     db: Session = SessionLocal()
-    carro = Carro(modelo=Modelo, ano=Ano, preco=Preco, descricao=Descricao, imagem=file_location)
+    carro = Carro(modelo=Modelo, ano=Ano, preco=Preco, descricao=Descricao, kilometros=Kilometros, cor=Cor, combustivel=Combustivel, imagem=file_location)
     db.add(carro)
     db.commit()
     db.refresh(carro)

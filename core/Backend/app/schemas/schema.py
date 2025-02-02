@@ -14,6 +14,9 @@ class CarroInfo(BaseModel):
     id: int
     modelo: str
     ano: int
+    kilometros: float 
+    cor: str 
+    combustivel: str 
     preco: float
     descricao: str
     imagem: str
