@@ -29,9 +29,9 @@ os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 async def create_carro(
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
     Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
-    Kilometros: float = Form(...),
-    Cor: str = Form(...),
-    Combustivel: str = Form(...),
+    Kilometros: float = Form(..., title="Kilometros rodados", alias="Kilometros", description="Kilometros rodados"),
+    Cor: str = Form(..., title="Cor do veiculo", alias="Cor", description="Cor do veiculo"),
+    Combustivel: str = Form(..., title="Combustivel do veiculo", alias="Combustivel", description="Combustivel do veiculo"),
     Preco: float = Form(..., title="Preço do veiculo", alias="Preco", description="Preço do veiculo"),
     Descricao: str = Form(..., title="Descriçao do veiculo", alias="Descricao", description="Descricao do veiculo"),
     Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo")
@@ -52,6 +52,7 @@ async def create_carro(
 @router.get(
         path="/carros/",
         status_code=status.HTTP_200_OK,
+        response_model=list[CarroInfo],
         response_description="Informations of car",
         description="Route get informations of car",
         name="Route get informations of car"
