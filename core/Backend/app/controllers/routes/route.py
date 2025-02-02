@@ -7,8 +7,22 @@ from app.database.database import SessionLocal
 from app.models.models import Carro
 from app.schemas.schema import CarroInfo
 import os
+import logging
+
 
 router = APIRouter()
+
+
+# Configuração do logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Adicione um evento de inicialização para logar a URL
+@router.on_event("startup")
+async def startup_event():
+    logger.info("Aplicação iniciada. Acesse a documentação em: http://0.0.0.0:8000/docs")
+
+
 
 # criar as rotas por categorias
 # realizar o CRUD, tanto de usuarios e veiculos
