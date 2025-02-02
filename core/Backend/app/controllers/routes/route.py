@@ -1,10 +1,11 @@
 from fastapi import APIRouter, UploadFile, File, Form, status
+from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 from app.database.database import SessionLocal
 from app.models.models import Carro
-from fastapi import Request
+from app.schemas.schema import CarroInfo
 import os
 
 router = APIRouter()
@@ -20,22 +21,24 @@ os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 @router.post(
         path="/carros/",
         status_code=status.HTTP_201_CREATED,
+        response_model=CarroInfo,
         response_description="Informations of Car",
         description="Route create car",
         name="Route create car"
 )
 async def create_carro(
-    modelo: str = Form(...),
-    ano: int = Form(...),
-    preco: float = Form(...),
-    file: UploadFile = File(...)
+    Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
+    Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
+    Preco: float = Form(..., title="Preço do veiculo", alias="Preco", description="Preço do veiculo"),
+    Descricao: str = Form(..., title="Descriçao do veiculo", alias="Descricao", description="Descricao do veiculo"),
+    Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo")
 ):
-    file_location = f"{UPLOAD_DIRECTORY}/{file.filename}"
+    file_location = f"{UPLOAD_DIRECTORY}/{Imagem.filename}"
     with open(file_location, "wb") as file_object:
-        file_object.write(await file.read())
+        file_object.write(await Imagem.read())
     
     db: Session = SessionLocal()
-    carro = Carro(modelo=modelo, ano=ano, preco=preco, imagem=file_location)
+    carro = Carro(modelo=Modelo, ano=Ano, preco=Preco, descricao=Descricao, imagem=file_location)
     db.add(carro)
     db.commit()
     db.refresh(carro)

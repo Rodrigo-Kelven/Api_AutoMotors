@@ -1,6 +1,7 @@
 # app/schemas/schema.py
 from pydantic import BaseModel
 
+
 class CarroBase(BaseModel):
     modelo: str
     ano: int
@@ -9,8 +10,15 @@ class CarroBase(BaseModel):
 class CarroCreate(CarroBase):
     imagem: str
 
-class Carro(CarroBase):
+class CarroInfo(BaseModel):
     id: int
+    modelo: str
+    ano: int
+    preco: float
+    descricao: str
+    imagem: str
+
 
     class Config:
         orm_mode = True
+
