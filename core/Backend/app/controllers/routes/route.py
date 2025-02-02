@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Form, status
+from fastapi import APIRouter, UploadFile, File, Form, status, Query
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
@@ -26,6 +26,9 @@ os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
         description="Route create car",
         name="Route create car"
 )
+# dividir por categorias, schema, models, categoria pra cada um
+# rael, esses forms devem estar somente no front, os dados serao enviado em forma de forms diretamente para o db, junto com a imagem
+# entao esses forms dessa rota sairao, ou nao, sla, veremos ao desenrolar do projeto
 async def create_carro(
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
     Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
@@ -78,3 +81,5 @@ async def read_root(request: Request):
     carros = db.query(Carro).all()
     db.close()
     return templates.TemplateResponse("index.html", {"request": request, "carros": carros})
+
+
