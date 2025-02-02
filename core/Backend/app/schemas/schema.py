@@ -1,6 +1,8 @@
 # app/schemas/schema.py
 from pydantic import BaseModel
 
+# criar modelos para cada categoria
+# implementar mais caracteristicas para cada categoria
 
 class CarroBase(BaseModel):
     modelo: str

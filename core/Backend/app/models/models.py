@@ -2,6 +2,9 @@
 from sqlalchemy import Column, Integer, String, Float
 from app.database.database import Base
 
+# criar um modelo para cada categoria
+
+
 # tabela que será criada no db
 class Carro(Base):
     __tablename__ = "carros"

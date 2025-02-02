@@ -10,6 +10,10 @@ import os
 
 router = APIRouter()
 
+# criar as rotas por categorias
+# realizar o CRUD, tanto de usuarios e veiculos
+
+
 # Configura o diretório de templates
 templates = Jinja2Templates(directory="templates")
 
