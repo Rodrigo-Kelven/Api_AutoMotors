@@ -1,6 +1,8 @@
 # app/models/models.py
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, DateTime, Integer, String, Float, Boolean
+from sqlalchemy.sql import func
 from app.database.database import Base
+
 
 # criar um modelo para cada categoria
 
@@ -10,15 +12,21 @@ class Carro(Base):
     __tablename__ = "carros"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    marca = Column(String, index=True, doc="Marca do veiculo")
     modelo = Column(String, index=True, doc="Modelo do veiculo")
     ano = Column(Integer, index=True, doc="Ano do veiculo")
-    kilometros = Column(Float, index=True, doc="Kilometragem do veiculo")
-    cor = Column(String, index=True, doc="Cor do veiculo")
-    combustivel = Column(String, index=True, doc="Combustivel do veiculo")
     preco = Column(Integer, index=True, doc="Preco do veiculo")
+    tipo = Column(String, index=True, doc="Tipo do veiculo")
+    disponivel = Column(Boolean, index=True, doc="Disponibilidade do veiculo")
+    quilometragem = Column(Float, index=True, doc="Kilometragem do veiculo")
+    cor = Column(String, index=True, doc="Cor do veiculo")
+    portas = Column(Integer, index=True, doc="Numero de portas do veiculo")
+    lugares = Column(Integer, index=True, doc="Quantidade de lugares do veiculo")
+    combustivel = Column(String, index=True, doc="Combustivel do veiculo")
     descricao = Column(String, doc="Descricao do veiculo")
+    endereco = Column(String, doc="Endereco do usuario")
     imagem = Column(String, doc="Imagem do veiculo", info="Imagem do veiculo")
-
+    data_cadastro = Column(DateTime, server_default=func.now(), doc="Data e hora do cadastro do veículo")
 
 """
 class Column(

@@ -1,11 +1,12 @@
 from fastapi import APIRouter
-from app.controllers.routes.route import router
+import logging
+from app.Veiculos.carros.controllers.routes.route import router
 
 
 app = APIRouter()
 
 def all_routes(app):
-    app.include_router(router)
+    app.include_router(router, tags=["Carros"], prefix="/api-veiculos/categoria")
 
 
 """
@@ -23,3 +24,13 @@ def include_router(
     generate_unique_id_function: (APIRoute) -> str = Default(generate_unique_id)
 ) -> None
 """
+
+def adicionar_route_documentacao(app):
+    # Configuração do logger
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
+    # Adicione um evento de inicialização para logar a URL
+    @app.on_event("startup")
+    async def startup_event():
+        logger.info("Aplicação iniciada. Acesse a documentação em: http://0.0.0.0:8000/docs")
