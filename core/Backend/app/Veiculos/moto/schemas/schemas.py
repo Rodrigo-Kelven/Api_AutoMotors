@@ -1,0 +1,1 @@
+# schemas para categoria motos

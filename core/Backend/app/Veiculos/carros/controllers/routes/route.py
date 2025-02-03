@@ -9,7 +9,7 @@ from app.Veiculos.carros.schemas.schema import CarroInfo
 import os
 
 
-
+# adicionar validacao e controle de acesso nas rotas, o usuario nao cadastrado e logado somente ver, ao logar, pode criar veiculos e editar seus dados e etc
 router = APIRouter()
 
 
