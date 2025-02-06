@@ -30,6 +30,7 @@ Ele permite que os usuários realizem operações como criar, ler, atualizar e e
     - Micro-Services
         - Criar um sistema de validação separado da API principal
         - Separar: (visualização, validação, regras de negócio)
+    - Criar schemas e modelos flexiveis para diferentes tipos de veiculos
  
 - ### Painel Admin
     - Adicionar pesquisa de produtos baseado em:
