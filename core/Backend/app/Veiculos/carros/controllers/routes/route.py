@@ -22,7 +22,7 @@ os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
 # rota POST 
 @router.post(
-        path="/carros/",
+        path="/veiculos-leves/",
         status_code=status.HTTP_201_CREATED,
         response_model=CarroInfo,
         response_description="Informations of Car",
@@ -77,7 +77,7 @@ async def create_carro(
 
 # rota GET
 @router.get(
-        path="/carros/",
+        path="/veiculos-leves/",
         status_code=status.HTTP_200_OK,
         response_model=list[CarroInfo],
         response_description="Informations of car",
@@ -93,7 +93,7 @@ async def get_carros():
 
 # Rota GET para renderizar o template HTML
 @router.get(
-        path="/",
+        path="/veiculos-leves",
         status_code=status.HTTP_200_OK,
         response_description="Renderizaçao pag",
         description="Renderizacao pag",
@@ -109,7 +109,7 @@ async def read_root(request: Request):
 
 # Rota PUT para atualizar um carro
 @router.put(
-    path="/carros/{carro_id}",
+    path="/veiculos-leves/{carro_id}",
     status_code=status.HTTP_200_OK,
     response_model=CarroInfo,
     response_description="Update car information",
@@ -168,7 +168,7 @@ async def update_carro(
 
 # Rota DELETE para excluir um carro
 @router.delete(
-    path="/carros/{carro_id}",
+    path="/veiculos-leves/{carro_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     response_description="Delete car",
     description="Route delete car",

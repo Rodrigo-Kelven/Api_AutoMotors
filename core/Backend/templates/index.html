@@ -38,7 +38,7 @@
         };
 
         async function loadCarros() {
-            const response = await fetch('/carros/');
+            const response = await fetch('/api-veiculos/categoria/carros/');
             const carros = await response.json();
             carros.forEach(addCarroToDOM);
         }

@@ -12,8 +12,11 @@ class CarroInfo(BaseModel):
     preco: float
     disponivel: bool
     tipo: str
+    cap_max: float
     quilometragem: float 
-    cor: str 
+    cor: str
+    portas: int
+    lugares: int
     combustivel: str 
     descricao: str
     endereco: str

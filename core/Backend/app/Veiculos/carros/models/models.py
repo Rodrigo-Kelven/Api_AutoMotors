@@ -9,7 +9,7 @@ from app.database.database import Base
 
 # tabela que será criada no db
 class Carro(Base):
-    __tablename__ = "carros"
+    __tablename__ = "veiculos_leves"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     marca = Column(String, index=True, doc="Marca do veiculo")
