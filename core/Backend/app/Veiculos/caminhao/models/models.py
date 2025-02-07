@@ -13,7 +13,7 @@ class Caminhao(Base):
     ano = Column(Integer, index=True, doc="Ano do veiculo")
     preco = Column(Integer, index=True, doc="Preco do veiculo")
     tipo = Column(String, index=True, doc="Tipo do veiculo")
-    cap_maxima = Column(Float, index=True, doc="Capacidade maxima do veiculo")
+    cap_maxima = Column(Integer, index=True, doc="Capacidade maxima do veiculo")
     disponivel = Column(Boolean, index=True, doc="Disponibilidade do veiculo")
     quilometragem = Column(Float, index=True, doc="Kilometragem do veiculo")
     cor = Column(String, index=True, doc="Cor do veiculo")

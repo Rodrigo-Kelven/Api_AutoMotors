@@ -12,7 +12,7 @@ class CaminhaoInfo(BaseModel):
     preco: float
     disponivel: bool
     tipo: str
-    cap_max: float
+    cap_maxima: int
     quilometragem: float 
     cor: str
     portas: int

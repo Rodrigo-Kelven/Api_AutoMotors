@@ -15,9 +15,9 @@ route_motos = APIRouter()
     path="/veiculos-ultra-leves",
     status_code=status.HTTP_200_OK,
     response_model=list[MotosInfo],
-    response_description="Informations veiculo",
-    description="Route get informations of veiculo",
-    name="Route get informations of veiculo"
+    response_description="Informaçoes de veiculo",
+    description="Route para pegar informações do veiculo",
+    name="Pegar informações do veiculo"
 )
 async def list_veiculos():
     db: Session = SessionLocal()
@@ -38,21 +38,21 @@ os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
         path="/veiculos-ultra-leves/",
         status_code=status.HTTP_201_CREATED,
         response_model=MotosInfo,
-        response_description="Informations of Car",
-        description="Route create car",
-        name="Route create car"
+        response_description="Informações da Moto",
+        description="Route para criar registro de Moto",
+        name="Criar registro para Moto"
 )
 async def create_moto(
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
     Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
     Preco: float = Form(..., title="Preço do veiculo", alias="Preco", description="Preço do veiculo"),
-    Tipo: str = Form(..., title="Tipo de veiculo", alias="Tipo", description="Tipo do veiculo", example="Caminhão Baú"),
+    Tipo: str = Form(..., title="Tipo de veiculo", alias="Tipo", description="Tipo do veiculo", example="Moto esportiva"),
     #Cap_Maxima: int = Form(..., title="Capacidade máxima do veiculo", alias="Cap_Maxima", description="Capacidade maxima do veículo"),
     Disponivel: bool = Form(..., title="Veiculo disponivel", alias="Disponivel", description="Disponibilidade do veiculo"),
     Quilometragem: float = Form(..., title="Kilometros rodados", alias="Quilometragem", description="Kilometros rodados"),
     Cor: str = Form(..., title="Cor do veiculo", alias="Cor", description="Cor do veiculo"),
-    Lugares: int = Form(..., title="Capacidade de ocupantes do veiculo", alias="Lugares", description="Quantidade de ocupantesat do veiculo"),
+    Lugares: int = Form(..., title="Capacidade de ocupantes do veiculo", alias="Lugares", description="Quantidade de ocupantes do veiculo"),
     Combustivel: str = Form(..., title="Combustivel do veiculo", alias="Combustivel", description="Combustivel do veiculo"),
     Descricao: str = Form(..., title="Descriçao do veiculo", alias="Descricao", description="Descricao do veiculo"),
     Endereco: str = Form(..., title="Endereco", alias="Endereco", description="Endereco"),
@@ -91,9 +91,9 @@ async def create_moto(
 @route_motos.get(
         path="/veiculos-ultra-leves",
         status_code=status.HTTP_200_OK,
-        response_description="Renderizaçao pag",
-        description="Renderizacao pag",
-        name="Renderizacao pag",
+        response_description="Informações da Moto",
+        description="Route para renderizar pagina",
+        name="Renderizar pagina",
         response_class=HTMLResponse
 )
 async def read_root(request: Request):
@@ -103,14 +103,30 @@ async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "carros": motos})
 
 
+# rota GET
+@route_motos.get(
+        path="/veiculos-ultra-leves/",
+        status_code=status.HTTP_200_OK,
+        response_model=list[MotosInfo],
+        response_description="Informaçoes da Moto",
+        description="Route para pegar informações da motos",
+        name="Pegar informações das motos"
+)
+async def get_carros():
+    db: Session = SessionLocal()
+    carros = db.query(Motos).all()
+    db.close()
+    return carros
+
+
 # Rota PUT para atualizar um carro
 @route_motos.put(
     path="/veiculos-ultra-leves/{moto_id}",
     status_code=status.HTTP_200_OK,
     response_model=MotosInfo,
-    response_description="Update information veiculo",
-    description="Route update information veiculo",
-    name ="Route update information veiculo"
+    response_description="Informações do veiculo atualizadas",
+    description="Route update information bikes",
+    name ="Atualizar infomações da moto"
 )
 async def update_veiculo(
     moto_id: int,
@@ -118,7 +134,7 @@ async def update_veiculo(
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
     Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
     Preco: float = Form(..., title="Preço do veiculo", alias="Preco", description="Preço do veiculo"),
-    Tipo: str = Form(..., title="Tipo de veiculo", alias="Tipo", description="Tipo do veiculo", example="Caminhão Baú"),
+    Tipo: str = Form(..., title="Tipo de veiculo", alias="Tipo", description="Tipo do veiculo", example="Moto Esportiva"),
     #Cap_Maxima: int = Form(..., title="Capacidade máxima do veiculo", alias="Cap_Maxima", description="Capacidade maxima do veículo"),
     Disponivel: bool = Form(..., title="Veiculo disponivel", alias="Disponivel", description="Disponibilidade do veiculo"),
     Quilometragem: float = Form(..., title="Kilometros rodados", alias="Quilometragem", description="Kilometros rodados"),
@@ -134,7 +150,7 @@ async def update_veiculo(
 
     if not moto:
         db.close()
-        raise HTTPException(status_code=404, detail="Carro não encontrado")
+        raise HTTPException(status_code=404, detail="Moto não encontrada")
 
     moto.marca = Marca
     moto.modelo = Modelo
@@ -167,9 +183,9 @@ async def update_veiculo(
 @route_motos.delete(
     path="/veiculos-ultra-leves/{moto_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    response_description="Delete car",
-    description="Route delete car",
-    name="Route delete car"
+    response_description="Moto deletada",
+    description="Route delete moto",
+    name="Deletar moto"
 )
 async def delete_carro(moto_id: int):
     db: Session = SessionLocal()

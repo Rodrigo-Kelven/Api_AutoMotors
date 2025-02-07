@@ -25,9 +25,9 @@ os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
         path="/veiculos-leves/",
         status_code=status.HTTP_201_CREATED,
         response_model=CarroInfo,
-        response_description="Informations of Car",
-        description="Route create car",
-        name="Route create car"
+        response_description="Informaçoes do carros",
+        description="Route para criar registro de carro",
+        name="Criar registro para Carro"
 )
 # dividir por categorias, schema, models, categoria pra cada um
 # rael, esses forms devem estar somente no front, os dados serao enviado em forma de forms diretamente para o db, junto com a imagem
@@ -80,9 +80,9 @@ async def create_carro(
         path="/veiculos-leves/",
         status_code=status.HTTP_200_OK,
         response_model=list[CarroInfo],
-        response_description="Informations of car",
-        description="Route get informations of car",
-        name="Route get informations of car"
+        response_description="Informaçoes do carros",
+        description="Route para pegar informacoes do carro",
+        name="Pegar informacoes do Carro"
 )
 async def get_carros():
     db: Session = SessionLocal()
@@ -95,9 +95,9 @@ async def get_carros():
 @router.get(
         path="/veiculos-leves",
         status_code=status.HTTP_200_OK,
-        response_description="Renderizaçao pag",
-        description="Renderizacao pag",
-        name="Renderizacao pag",
+        response_description="Renderizaçao da pagina",
+        description="Renderizacao de pagina",
+        name="Renderizacao da pagina",
         response_class=HTMLResponse
 )
 async def read_root(request: Request):
@@ -112,9 +112,9 @@ async def read_root(request: Request):
     path="/veiculos-leves/{carro_id}",
     status_code=status.HTTP_200_OK,
     response_model=CarroInfo,
-    response_description="Update car information",
-    description="Route update car information",
-    name ="Route update car information"
+    response_description="Informções atualizadas",
+    description="Route update informações do carro",
+    name ="Atualizar informações do Carro"
 )
 async def update_carro(
     carro_id: int,
@@ -170,9 +170,9 @@ async def update_carro(
 @router.delete(
     path="/veiculos-leves/{carro_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    response_description="Delete car",
-    description="Route delete car",
-    name="Route delete car"
+    response_description="Delete carro",
+    description="Route delete carro",
+    name="Delete Carro"
 )
 async def delete_carro(carro_id: int,):
     db: Session = SessionLocal()

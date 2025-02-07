@@ -11,19 +11,7 @@ import os
 
 router_caminhoes = APIRouter()
 
-@router_caminhoes.get(
-    path="/veiculos-pesados",
-    status_code=status.HTTP_200_OK,
-    response_model=list[CaminhaoInfo],
-    response_description="Informations veiculo",
-    description="Route get informations of veiculo",
-    name="Route get informations of veiculo"
-)
-async def list_veiculos():
-    db: Session = SessionLocal()
-    caminhao = db.query(Caminhao).all()
-    db.close()
-    return caminhao
+
 
 
 # Configura o diretório de templates
@@ -38,9 +26,9 @@ os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
         path="/veiculos-pesados/",
         status_code=status.HTTP_201_CREATED,
         response_model=CaminhaoInfo,
-        response_description="Informations of Car",
-        description="Route create car",
-        name="Route create car"
+        response_description="Informações do caminhão",
+        description="Route para criar registro do caminhão",
+        name="Criar registro para caminhão"
 )
 async def create_caminhao(
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
@@ -48,7 +36,7 @@ async def create_caminhao(
     Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
     Preco: float = Form(..., title="Preço do veiculo", alias="Preco", description="Preço do veiculo"),
     Tipo: str = Form(..., title="Tipo de veiculo", alias="Tipo", description="Tipo do veiculo", example="Caminhão Baú"),
-    Cap_Maxima: float = Form(..., title="Capacidade máxima do veiculo", alias="Cap_Maxima", description="Capacidade maxima do veículo"),
+    Cap_Maxima: int = Form(..., title="Capacidade máxima do veiculo", alias="Cap_Maxima", description="Capacidade maxima do veículo"),
     Disponivel: bool = Form(..., title="Veiculo disponivel", alias="Disponivel", description="Disponibilidade do veiculo"),
     Quilometragem: float = Form(..., title="Kilometros rodados", alias="Quilometragem", description="Kilometros rodados"),
     Cor: str = Form(..., title="Cor do veiculo", alias="Cor", description="Cor do veiculo"),
@@ -105,38 +93,55 @@ async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "carros": carros})
 
 
+# rota GET
+@router_caminhoes.get(
+        path="/veiculos-pesados",
+        status_code=status.HTTP_200_OK,
+        response_model=list[CaminhaoInfo],
+        response_description="Informações do caminhão",
+        description="Route para pegar informações do caminhâo",
+        name="Pegar informações do caminhão"
+)
+async def list_veiculos():
+    db: Session = SessionLocal()
+    caminhao = db.query(Caminhao).all()
+    db.close()
+    return caminhao
+
+
 # Rota PUT para atualizar um carro
 @router_caminhoes.put(
     path="/veiculos-pesados/{veiculo_id}",
     status_code=status.HTTP_200_OK,
     response_model=CaminhaoInfo,
-    response_description="Update information veiculo",
-    description="Route update information veiculo",
-    name ="Route update information veiculo"
+    response_description="Update informações de caminhão",
+    description="Route update informações de caminhão",
+    name ="Atualizar informações do caminhão"
 )
-async def update_veiculo(
+async def update_caminhao(
     veiculo_id: int,
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
     Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
     Preco: float = Form(..., title="Preço do veiculo", alias="Preco", description="Preço do veiculo"),
-    Tipo: str = Form(..., title="Tipo de veiculo", alias="Tipo", description="Tipo do veiculo", example="carro",),
+    Tipo: str = Form(..., title="Tipo de veiculo", alias="Tipo", description="Tipo do veiculo", example="Caminhão Baú"),
+    Cap_Maxima: int = Form(..., title="Capacidade máxima do veiculo", alias="Cap_Maxima", description="Capacidade maxima do veículo"),
     Disponivel: bool = Form(..., title="Veiculo disponivel", alias="Disponivel", description="Disponibilidade do veiculo"),
     Quilometragem: float = Form(..., title="Kilometros rodados", alias="Quilometragem", description="Kilometros rodados"),
     Cor: str = Form(..., title="Cor do veiculo", alias="Cor", description="Cor do veiculo"),
     Portas: int = Form(..., title="Numero de portas do veiculo", alias="Portas", description="Numero de portas do veiculo"),
-    Lugares: int = Form(..., title="Capacidade de ocupantes do veiculo", alias="Lugares", description="Quantidade de ocupantes do veiculo"),
+    Lugares: int = Form(..., title="Capacidade de ocupantes do veiculo", alias="Lugares", description="Quantidade de ocupantesat do veiculo"),
     Combustivel: str = Form(..., title="Combustivel do veiculo", alias="Combustivel", description="Combustivel do veiculo"),
     Descricao: str = Form(..., title="Descriçao do veiculo", alias="Descricao", description="Descricao do veiculo"),
     Endereco: str = Form(..., title="Endereco", alias="Endereco", description="Endereco"),
-    Imagem: UploadFile = File(None, title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo")
+    Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo")
 ):
     db: Session = SessionLocal()
-    caminhao = db.query(CaminhaoInfo).filter(CaminhaoInfo.id == veiculo_id).first()
+    caminhao = db.query(Caminhao).filter(Caminhao.id == veiculo_id).first()
 
     if not caminhao:
         db.close()
-        raise HTTPException(status_code=404, detail="Carro não encontrado")
+        raise HTTPException(status_code=404, detail="Caminhão não encontrado")
 
     caminhao.marca = Marca
     caminhao.modelo = Modelo
@@ -144,6 +149,7 @@ async def update_veiculo(
     caminhao.preco = Preco
     caminhao.disponivel = Disponivel
     caminhao.tipo = Tipo
+    caminhao.cap_maxima = Cap_Maxima
     caminhao.quilometragem = Quilometragem
     caminhao.cor = Cor
     caminhao.portas = Portas
@@ -164,23 +170,24 @@ async def update_veiculo(
     db.close()
     return caminhao
 
+
 # Rota DELETE para excluir um carro
 @router_caminhoes.delete(
     path="/veiculos-pesados/{veiculo_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    response_description="Delete car",
-    description="Route delete car",
-    name="Route delete car"
+    response_description="Delete caminhão",
+    description="Route delete caminhão",
+    name="Delete caminhão"
 )
 async def delete_carro(carro_id: int,):
     db: Session = SessionLocal()
-    carro = db.query(CaminhaoInfo).filter(CaminhaoInfo.id == carro_id).first()
+    carro = db.query(Caminhao).filter(Caminhao.id == carro_id).first()
 
     if not carro:
         db.close()
-        raise HTTPException(status_code=404, detail="Carro não encontrado")
+        raise HTTPException(status_code=404, detail="Caminhão não encontrado")
 
     db.delete(carro)
     db.commit()
     db.close()
-    return {"detail": "Carro excluído com sucesso"}
+    return {"detail": "Caminhão excluído com sucesso"}
