@@ -23,9 +23,6 @@
             - media de preço dos produtos
        - quantidade de estrelas dos produtos -> média
           
-- ### Frontend
-  - Utilizar Flask para renderizar páginas em (Html, CSS)
-  - Usar algum framework -> (React, Vue, etc)
     
 - ### Autenticação e Autorização:
     - Implementar um sistema de autenticação, como OAuth2 ou JWT, para garantir que apenas usuários autorizados possam acessar a API.
