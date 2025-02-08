@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from app.database.database import Base, engine
+from app.database.database import Base, engine_automotors_veiculos
+from app.config.config import *
 from fastapi.staticfiles import StaticFiles
 from app.Veiculos.all_routes import all_routes
 
@@ -12,6 +13,9 @@ app = FastAPI()
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # cria as tabelas ao iniciar a aplicação, sim, deve estar aqui
-Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine_automotors_veiculos)
 
 all_routes(app)
+
+# Adiciona o middleware ao FastAPI, verifica requests e responses
+app.add_middleware(LogRequestMiddleware)

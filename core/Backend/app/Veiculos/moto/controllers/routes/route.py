@@ -3,7 +3,7 @@ from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
-from app.database.database import SessionLocal
+from app.database.database import SessionLocal_veiculos
 from app.Veiculos.moto.schemas.schemas import MotosInfo
 from app.Veiculos.moto.models.models import Motos
 import os
@@ -20,7 +20,7 @@ route_motos = APIRouter()
     name="Pegar informações do veiculo"
 )
 async def list_veiculos():
-    db: Session = SessionLocal()
+    db: Session = SessionLocal_veiculos()
     moto = db.query(Motos).all()
     db.close()
     return moto
@@ -62,7 +62,7 @@ async def create_moto(
     with open(file_location, "wb") as file_object:
         file_object.write(await Imagem.read())
     
-    db: Session = SessionLocal()
+    db: Session = SessionLocal_veiculos()
     moto = Motos(
         marca=Marca,
         modelo=Modelo,
@@ -88,7 +88,9 @@ async def create_moto(
 
 
 # Rota GET para renderizar o template HTML
+# nao esta funcionando
 @route_motos.get(
+        deprecated=True,
         path="/veiculos-ultra-leves",
         status_code=status.HTTP_200_OK,
         response_description="Informações da Moto",
@@ -97,7 +99,7 @@ async def create_moto(
         response_class=HTMLResponse
 )
 async def read_root(request: Request):
-    db: Session = SessionLocal()
+    db: Session = SessionLocal_veiculos()
     motos = db.query(Motos).all()
     db.close()
     return templates.TemplateResponse("index.html", {"request": request, "carros": motos})
@@ -113,7 +115,7 @@ async def read_root(request: Request):
         name="Pegar informações das motos"
 )
 async def get_carros():
-    db: Session = SessionLocal()
+    db: Session = SessionLocal_veiculos()
     carros = db.query(Motos).all()
     db.close()
     return carros
@@ -145,7 +147,7 @@ async def update_veiculo(
     Endereco: str = Form(..., title="Endereco", alias="Endereco", description="Endereco"),
     Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo")
 ):
-    db: Session = SessionLocal()
+    db: Session = SessionLocal_veiculos()
     moto = db.query(Motos).filter(Motos.id == moto_id).first()
 
     if not moto:
@@ -179,6 +181,7 @@ async def update_veiculo(
     db.close()
     return moto
 
+
 # Rota DELETE para excluir um carro
 @route_motos.delete(
     path="/veiculos-ultra-leves/{moto_id}",
@@ -188,7 +191,7 @@ async def update_veiculo(
     name="Deletar moto"
 )
 async def delete_carro(moto_id: int):
-    db: Session = SessionLocal()
+    db: Session = SessionLocal_veiculos()
     moto = db.query(Motos).filter(Motos.id == moto_id).first()
 
     if not moto:

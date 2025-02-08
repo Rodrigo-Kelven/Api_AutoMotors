@@ -3,7 +3,7 @@ from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
-from app.database.database import SessionLocal
+from app.database.database import SessionLocal_veiculos
 from app.Veiculos.caminhao.schemas.schemas import CaminhaoInfo
 from app.Veiculos.caminhao.models.models import Caminhao
 import os
@@ -51,7 +51,7 @@ async def create_caminhao(
     with open(file_location, "wb") as file_object:
         file_object.write(await Imagem.read())
     
-    db: Session = SessionLocal()
+    db: Session = SessionLocal_veiculos()
     caminhao = Caminhao(
         marca=Marca,
         modelo=Modelo,
@@ -78,7 +78,9 @@ async def create_caminhao(
 
 
 # Rota GET para renderizar o template HTML
+# nao esta funcionando
 @router_caminhoes.get(
+        deprecated=True,
         path="/veiculos-pesados",
         status_code=status.HTTP_200_OK,
         response_description="Renderizaçao pag",
@@ -87,7 +89,7 @@ async def create_caminhao(
         response_class=HTMLResponse
 )
 async def read_root(request: Request):
-    db: Session = SessionLocal()
+    db: Session = SessionLocal_veiculos()
     carros = db.query(CaminhaoInfo).all()
     db.close()
     return templates.TemplateResponse("index.html", {"request": request, "carros": carros})
@@ -95,7 +97,7 @@ async def read_root(request: Request):
 
 # rota GET
 @router_caminhoes.get(
-        path="/veiculos-pesados",
+        path="/veiculos-pesados/",
         status_code=status.HTTP_200_OK,
         response_model=list[CaminhaoInfo],
         response_description="Informações do caminhão",
@@ -103,7 +105,7 @@ async def read_root(request: Request):
         name="Pegar informações do caminhão"
 )
 async def list_veiculos():
-    db: Session = SessionLocal()
+    db: Session = SessionLocal_veiculos()
     caminhao = db.query(Caminhao).all()
     db.close()
     return caminhao
@@ -136,7 +138,7 @@ async def update_caminhao(
     Endereco: str = Form(..., title="Endereco", alias="Endereco", description="Endereco"),
     Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo")
 ):
-    db: Session = SessionLocal()
+    db: Session = SessionLocal_veiculos()
     caminhao = db.query(Caminhao).filter(Caminhao.id == veiculo_id).first()
 
     if not caminhao:
@@ -180,7 +182,7 @@ async def update_caminhao(
     name="Delete caminhão"
 )
 async def delete_carro(carro_id: int,):
-    db: Session = SessionLocal()
+    db: Session = SessionLocal_veiculos()
     carro = db.query(Caminhao).filter(Caminhao.id == carro_id).first()
 
     if not carro:

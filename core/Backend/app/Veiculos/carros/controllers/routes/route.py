@@ -3,7 +3,7 @@ from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
-from app.database.database import SessionLocal
+from app.database.database import SessionLocal_veiculos
 from app.Veiculos.carros.models.models import Carro
 from app.Veiculos.carros.schemas.schema import CarroInfo
 import os
@@ -52,7 +52,7 @@ async def create_carro(
     with open(file_location, "wb") as file_object:
         file_object.write(await Imagem.read())
     
-    db: Session = SessionLocal()
+    db: Session = SessionLocal_veiculos()
     carro = Carro(
         marca=Marca,
         modelo=Modelo,
@@ -85,7 +85,7 @@ async def create_carro(
         name="Pegar informacoes do Carro"
 )
 async def get_carros():
-    db: Session = SessionLocal()
+    db: Session = SessionLocal_veiculos()
     carros = db.query(Carro).all()
     db.close()
     return carros
@@ -101,7 +101,7 @@ async def get_carros():
         response_class=HTMLResponse
 )
 async def read_root(request: Request):
-    db: Session = SessionLocal()
+    db: Session = SessionLocal_veiculos()
     carros = db.query(Carro).all()
     db.close()
     return templates.TemplateResponse("index.html", {"request": request, "carros": carros})
@@ -133,7 +133,7 @@ async def update_carro(
     Endereco: str = Form(..., title="Endereco", alias="Endereco", description="Endereco"),
     Imagem: UploadFile = File(None, title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo")
 ):
-    db: Session = SessionLocal()
+    db: Session = SessionLocal_veiculos()
     carro = db.query(Carro).filter(Carro.id == carro_id).first()
 
     if not carro:
@@ -175,7 +175,7 @@ async def update_carro(
     name="Delete Carro"
 )
 async def delete_carro(carro_id: int,):
-    db: Session = SessionLocal()
+    db: Session = SessionLocal_veiculos()
     carro = db.query(Carro).filter(Carro.id == carro_id).first()
 
     if not carro:
