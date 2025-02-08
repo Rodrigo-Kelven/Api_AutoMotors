@@ -3,9 +3,9 @@ from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
-from app.database.database import SessionLocal_veiculos
-from app.Veiculos.carros.models.models import Carro
-from app.Veiculos.carros.schemas.schema import CarroInfo
+from core.Backend.app.database.database import SessionLocal_veiculos
+from core.Backend.app.Veiculos.carros.models.models import Carro
+from core.Backend.app.Veiculos.carros.schemas.schema import CarroInfo
 import os
 
 

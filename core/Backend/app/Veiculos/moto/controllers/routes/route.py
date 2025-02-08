@@ -3,9 +3,9 @@ from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
-from app.database.database import SessionLocal_veiculos
-from app.Veiculos.moto.schemas.schemas import MotosInfo
-from app.Veiculos.moto.models.models import Motos
+from core.Backend.app.database.database import SessionLocal_veiculos
+from core.Backend.app.Veiculos.moto.schemas.schemas import MotosInfo
+from core.Backend.app.Veiculos.moto.models.models import Motos
 import os
 
 
@@ -160,7 +160,6 @@ async def update_veiculo(
     moto.preco = Preco
     moto.disponivel = Disponivel
     moto.tipo = Tipo
-
     moto.disponivel = Disponivel
     moto.quilometragem = Quilometragem
     moto.cor = Cor

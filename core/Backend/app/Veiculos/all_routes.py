@@ -1,14 +1,16 @@
 from fastapi import APIRouter
 import logging
 from enum import Enum
-from app.Veiculos.carros.controllers.routes.route import router
-from app.Veiculos.caminhao.controllers.routes.route import router_caminhoes
-from app.Veiculos.moto.controllers.routes.route import route_motos
+from core.Backend.app.Veiculos.carros.controllers.routes.route import router
+from core.Backend.app.Veiculos.caminhao.controllers.routes.route import router_caminhoes
+from core.Backend.app.Veiculos.moto.controllers.routes.route import route_motos
+from core.Backend.auth.routes.routes import routes_auth_auten
 
 class Tags(Enum):
     carros = "Veiculos Leves"
     caminhoes = "Veiculos Pesados"
     motos = "Veiculos Ultra Leves"
+    auth_auten = "Autenticação e Autorização"
 
 app = APIRouter()
 
@@ -16,6 +18,7 @@ def all_routes(app):
     app.include_router(router, tags=[Tags.carros], prefix="/api-veiculos/categoria")
     app.include_router(router_caminhoes, tags=[Tags.caminhoes], prefix="/api-veiculos/categoria")
     app.include_router(route_motos, tags=[Tags.motos], prefix="/api-veiculos/categoria")
+    app.include_router(routes_auth_auten, tags=[Tags.auth_auten], prefix="/api-veiculos/auten_auth")
 
 
 """

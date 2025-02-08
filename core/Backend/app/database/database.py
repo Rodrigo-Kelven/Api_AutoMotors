@@ -53,8 +53,16 @@ Base = declarative_base()
 # Dependência para obter a sessão do banco de dados
 def get_db():
     db = SessionLocal_veiculos()
-    db_users = SessionLocal_users()
     try:
         yield db
     finally:
         db.close()
+
+
+# Dependência para obter a sessão do banco de dados de usuários
+def get_db_users():
+    db_users = SessionLocal_users()
+    try:
+        yield db_users
+    finally:
+        db_users.close()

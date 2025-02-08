@@ -1,7 +1,7 @@
 # app/models/models.py
 from sqlalchemy import Column, DateTime, Integer, String, Float, Boolean
 from sqlalchemy.sql import func
-from app.database.database import Base
+from core.Backend.app.database.database import Base
 
 
 # criar um modelo para cada categoria

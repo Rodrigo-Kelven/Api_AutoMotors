@@ -3,9 +3,9 @@ from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
-from app.database.database import SessionLocal_veiculos
-from app.Veiculos.caminhao.schemas.schemas import CaminhaoInfo
-from app.Veiculos.caminhao.models.models import Caminhao
+from core.Backend.app.database.database import SessionLocal_veiculos
+from core.Backend.app.Veiculos.caminhao.schemas.schemas import CaminhaoInfo
+from core.Backend.app.Veiculos.caminhao.models.models import Caminhao
 import os
 
 
