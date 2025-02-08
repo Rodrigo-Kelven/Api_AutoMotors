@@ -12,14 +12,14 @@ import os
 router_caminhoes = APIRouter()
 
 
-
-
 # Configura o diretório de templates
 templates = Jinja2Templates(directory="templates")
 
 # verifica se a pasta existe
 UPLOAD_DIRECTORY = "uploads"
 os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
+
+
 
 # rota POST 
 @router_caminhoes.post(
