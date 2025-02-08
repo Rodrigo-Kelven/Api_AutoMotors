@@ -1,9 +1,9 @@
 from fastapi import APIRouter, status, Body, Form, Query, HTTPException, UploadFile, File
-from fastapi import Request
+from fastapi import Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
-from core.Backend.app.database.database import SessionLocal_veiculos
+from core.Backend.app.database.database import SessionLocal_veiculos, get_db
 from core.Backend.app.Veiculos.caminhao.schemas.schemas import CaminhaoInfo
 from core.Backend.app.Veiculos.caminhao.models.models import Caminhao
 import os
@@ -45,13 +45,14 @@ async def create_caminhao(
     Combustivel: str = Form(..., title="Combustivel do veiculo", alias="Combustivel", description="Combustivel do veiculo"),
     Descricao: str = Form(..., title="Descriçao do veiculo", alias="Descricao", description="Descricao do veiculo"),
     Endereco: str = Form(..., title="Endereco", alias="Endereco", description="Endereco"),
-    Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo")
+    Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo"),
+    db: Session = Depends(get_db),
 ):
     file_location = f"{UPLOAD_DIRECTORY}/{Imagem.filename}"
     with open(file_location, "wb") as file_object:
         file_object.write(await Imagem.read())
     
-    db: Session = SessionLocal_veiculos()
+
     caminhao = Caminhao(
         marca=Marca,
         modelo=Modelo,

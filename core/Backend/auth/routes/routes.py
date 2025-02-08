@@ -64,24 +64,15 @@ async def read_own_items(
 
 
 # Rota para criar um novo usuário -> qualquer usuario pode criar 
-@routes_auth_auten.post(
-        path="/users/",
-        response_model=UserResponseCreate,
-        response_description="Create user",
-        description="Route create user",
-        name="Route create user"
-)
+@routes_auth_auten.post("/users/")
 async def create_user(
     username: str = Form(...),
     email: str = Form(...),
     full_name: str = Form(...),
     password: str = Form(...),
-    #role: str = Form(...)
-
+    db: Session = Depends(get_db_users),
 ):
-    db = SessionLocal_users()
     if get_user(db, username):
-        db.close()
         raise HTTPException(status_code=400, detail="Username already registered")
 
     hashed_password = get_password_hash(password)
@@ -90,12 +81,10 @@ async def create_user(
         email=email,
         full_name=full_name,
         hashed_password=hashed_password,
-        #role=role
     )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    db.close()
     return db_user
 
 
