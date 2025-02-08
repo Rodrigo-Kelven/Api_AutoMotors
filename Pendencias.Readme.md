@@ -29,6 +29,7 @@
     
 - ### Autenticação e Autorização:
     - Implementar um sistema de autenticação, como OAuth2 ou JWT, para garantir que apenas usuários autorizados possam acessar a API.
+          - Implementado. So realizar update
     - Centralizar a autorização para controlar o acesso a diferentes serviços
 
 - ### Otimização do Roteamento:
