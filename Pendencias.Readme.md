@@ -7,14 +7,7 @@
     - Criar schemas e modelos flexiveis para diferentes tipos de veiculos
         - Utilizar NoSQL, RoBo 3T
         - Redis
- 
-- ### Painel Admin
-    - Adicionar pesquisa de produtos baseado em:
-        -  nome do produto
-        -  categoria do produto
-        -  preço do produto
-            - media de preço dos produtos
-       - quantidade de estrelas dos produtos -> média
+
       
 - ### Criação de um painel administrativo -> (Baseado no Django)
     - Controle de:
@@ -22,6 +15,13 @@
         - Usuarios -> Update
         - Produtos
         - Análise de vendas
+    
+    - Adicionar pesquisa de produtos baseado em:
+        -  nome do produto
+        -  categoria do produto
+        -  preço do produto
+            - media de preço dos produtos
+       - quantidade de estrelas dos produtos -> média
           
 - ### Frontend
   - Utilizar Flask para renderizar páginas em (Html, CSS)
