@@ -1,6 +1,6 @@
 from core.Backend.auth.models.models import UserDB
 from core.Backend.app.database.database import SessionLocal_users, get_db_users
-from core.Backend.auth.schemas.schemas import Token, User, UserResponse, UserResponseCreate
+from core.Backend.auth.schemas.schemas import Token, User, UserResponse, UserResponseUpdate
 from typing import List, Annotated
 from fastapi import APIRouter, Depends, HTTPException, status, Form, BackgroundTasks, Body
 from core.Backend.auth.auth import *
@@ -127,7 +127,7 @@ async def get_users(current_user: Annotated[UserResponse , Depends(get_current_a
         name="Route informations user"
 )
 async def update_user(
-    username: str, user: UserResponse, current_user: Annotated[User , Depends(get_current_active_user)]
+    username: str, user: UserResponseUpdate, current_user: Annotated[User , Depends(get_current_active_user)]
 ):
     db = SessionLocal_users()
     db_user = get_user(db, username)

@@ -28,10 +28,11 @@ class UserResponse(BaseModel):
     role: str
 
 
-class UserResponseCreate(BaseModel):
-    username: str
+class UserResponseUpdate(BaseModel):
     email: str
     full_name: str
+    hashed_password: str
+    disabled: bool
 
 
 class UserInDB(User):
