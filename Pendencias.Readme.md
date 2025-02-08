@@ -39,6 +39,7 @@
 
 - ### Monitoramento e Logging:
     - Integrar ferramentas de monitoramento, como Prometheus ou Grafana, para acompanhar o desempenho da API e identificar gargalos.
+          - Middleware implementado.
     - Implementar um sistema de logging detalhado para registrar erros e eventos importantes, facilitando a depuração.
 
 - ### Documentação:
