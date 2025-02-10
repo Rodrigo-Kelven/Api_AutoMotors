@@ -24,3 +24,6 @@ app.add_middleware(LogRequestMiddleware)
 
 # funcao para configuracao do middleware
 app.middleware("http")(rate_limit_middleware)
+
+# adicionar CORS para implementacao com o frontend
+#cors(app)

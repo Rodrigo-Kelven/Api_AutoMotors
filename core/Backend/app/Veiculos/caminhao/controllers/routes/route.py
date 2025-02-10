@@ -46,12 +46,12 @@ async def create_caminhao(
     Descricao: str = Form(..., title="Descriçao do veiculo", alias="Descricao", description="Descricao do veiculo"),
     Endereco: str = Form(..., title="Endereco", alias="Endereco", description="Endereco"),
     Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo"),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db)
 ):
     file_location = f"{UPLOAD_DIRECTORY}/{Imagem.filename}"
     with open(file_location, "wb") as file_object:
         file_object.write(await Imagem.read())
-    
+
 
     caminhao = Caminhao(
         marca=Marca,
@@ -109,6 +109,27 @@ async def list_veiculos():
     db: Session = SessionLocal_veiculos()
     caminhao = db.query(Caminhao).all()
     db.close()
+    return caminhao
+
+# rota GET caminhao por ID
+@router_caminhoes.get(
+    path="/veiculos-pesados/{veiculo_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=CaminhaoInfo,
+    response_description="Informações do caminhão",
+    description="Route para pegar informações do caminhão",
+    name="Pegar informações do caminhão"
+)
+async def get_veiculo_id(
+    veiculo_id: int, 
+    db: Session = Depends(get_db),
+    ):
+    caminhao = db.query(Caminhao).filter(Caminhao.id == veiculo_id).first()
+    print("Encontrado no banco de dados")
+
+    if caminhao is None:
+        raise HTTPException(status_code=404, detail="Caminhão não encontrado")
+
     return caminhao
 
 
