@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 class CaminhaoInfo(BaseModel):
-    id: int
+    id: str
     marca: str
     modelo: str
     ano: int

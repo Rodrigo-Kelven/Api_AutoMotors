@@ -9,6 +9,7 @@ from core.Backend.app.Veiculos.caminhao.models.models import Caminhao
 import os
 
 
+
 router_caminhoes = APIRouter()
 
 
@@ -51,7 +52,7 @@ async def create_caminhao(
     file_location = f"{UPLOAD_DIRECTORY}/{Imagem.filename}"
     with open(file_location, "wb") as file_object:
         file_object.write(await Imagem.read())
-
+    
 
     caminhao = Caminhao(
         marca=Marca,
@@ -70,11 +71,13 @@ async def create_caminhao(
         endereco=Endereco,
         imagem=file_location
     )
+
     db.add(caminhao)
     db.commit()
     db.refresh(caminhao)
     db.close()
     return caminhao
+
 
 
 
