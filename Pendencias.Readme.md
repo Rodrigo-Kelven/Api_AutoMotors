@@ -24,9 +24,8 @@
        - quantidade de estrelas dos produtos -> média
           
     
-- ### Autenticação e Autorização:
-    - Implementar um sistema de autenticação, como OAuth2 ou JWT, para garantir que apenas usuários autorizados possam acessar a API.
-          - Implementado. 
+- ### Autenticação e Autorização: (implementado)
+    - Implementar um sistema de autenticação, como OAuth2 ou JWT, para garantir que apenas usuários autorizados possam acessar a API. 
     - Centralizar a autorização para controlar o acesso a diferentes serviços
 
 - ### Otimização do Roteamento:
