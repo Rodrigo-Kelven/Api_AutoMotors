@@ -49,7 +49,7 @@
     - Criar uma suíte de testes automatizados para garantir que a API funcione conforme esperado e para detectar regressões rapidamente.
     - Realizar testes de carga para avaliar como a API se comporta sob diferentes níveis de tráfego.
 
-- ### Tratamento de Erros:
+- ### Tratamento de Erros: (implementado)
     - Implementar um sistema de tratamento de erros que retorne mensagens de erro claras e significativas para os usuários.
     - Utilizar códigos de status HTTP apropriados para diferentes tipos de falhas.
 
