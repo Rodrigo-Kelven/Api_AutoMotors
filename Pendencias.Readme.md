@@ -41,7 +41,7 @@
           - Middleware implementado.
     - Implementar um sistema de logging detalhado para registrar erros e eventos importantes, facilitando a depuração.
 
-- ### Documentação:
+- ### Documentação: (atualizado)
     - Utilizar ferramentas como Swagger ou Redoc para gerar documentação interativa da API, facilitando o uso por desenvolvedores.
     - Manter a documentação atualizada com exemplos de uso e descrições claras dos endpoints.
 
