@@ -53,7 +53,7 @@
     - Implementar um sistema de tratamento de erros que retorne mensagens de erro claras e significativas para os usuários.
     - Utilizar códigos de status HTTP apropriados para diferentes tipos de falhas.
 
-- ### Versionamento da API:
+- ### Versionamento da API: (implementado)
     - Considerar implementar versionamento na API para permitir atualizações sem quebrar a compatibilidade com clientes existentes.
     - Utilizar um padrão de URL que inclua a versão, como /api/v1/....
 
