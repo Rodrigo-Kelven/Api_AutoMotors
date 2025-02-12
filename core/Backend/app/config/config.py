@@ -1,7 +1,10 @@
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response
+from starlette.responses import JSONResponse
+import traceback
 import logging
 from fastapi import Request, HTTPException
-from fastapi.responses import JSONResponse
 import time
 
 
@@ -9,17 +12,21 @@ logging.basicConfig(level=logging.INFO)
 
 class LogRequestMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
+
         # Loga os detalhes da requisição
         logging.info(f"Requisição recebida: {request.method} {request.url}")
-        
+        start_time = time.time()  # Marcar o tempo de início
+        process_time = time.time() - start_time  # Calcula o tempo de processamento
         # Chama o próximo middleware ou rota
-        response = await call_next(request)
-        
+        response: Response = await call_next(request)  # Chama a próxima parte da solicitação
+        response.headers['X-Process-Time'] = str(process_time)  # Adiciona o tempo de processamento no cabeçalho da resposta
+
         # Loga os detalhes da resposta
         logging.info(f"Resposta enviada com status {response.status_code}")
         
         return response
     
+
 
 RATE_LIMIT = 65 # Número máximo de requisições por minuto
 TIME_WINDOW = 60  # Janela de tempo em segundos (1 minuto)

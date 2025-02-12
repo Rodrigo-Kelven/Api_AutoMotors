@@ -88,6 +88,30 @@ async def get_carros():
     return carros
 
 
+@router_carros.get(
+    path="/veiculos-leves/{carro_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=CarroInfo,
+    response_description="Informações dos carros",
+    description="Route para pegar informações do carro",
+    name="Pegar informações do Carro"
+)
+async def get_carros(carro_id: str):
+    try:
+        # Tenta converter o carro_id para ObjectId, porque o MongoDB trabalha com objetos!
+        carro_object_id = ObjectId(carro_id)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="ID de carro inválido")
+
+    # Busca o carro no banco de dados
+    carro = await db.carros.find_one({"_id": carro_object_id})
+
+    if not carro:
+        raise HTTPException(status_code=404, detail="Carro não encontrado")
+    
+    # Retorna o carro no formato adequado, com o id convertido
+    return CarroInfo.from_mongo(carro)
+
 
 # Rota GET para renderizar o template HTML
 @router_carros.get(
@@ -202,4 +226,3 @@ async def delete_carro(carro_id: str):
     await db.carros.delete_one({"_id": carro_object_id})
 
     return {"detail": "Carro excluído com sucesso"}
-
