@@ -4,9 +4,6 @@
     - Micro-Services
         - Criar um sistema de validação separado da API principal
         - Separar: (visualização, validação, regras de negócio)
-    - Criar schemas e modelos flexiveis para diferentes tipos de veiculos
-        - Utilizar NoSQL, RoBo 3T
-        - Redis
 
       
 - ### Criação de um painel administrativo -> (Baseado no Django)
