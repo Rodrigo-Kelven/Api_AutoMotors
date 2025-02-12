@@ -45,8 +45,6 @@
     - Utilizar ferramentas como Swagger ou Redoc para gerar documentação interativa da API, facilitando o uso por desenvolvedores.
     - Manter a documentação atualizada com exemplos de uso e descrições claras dos endpoints.
 
-- ### Testes Automatizados:
-
 - ### Tratamento de Erros: (implementado)
     - Implementar um sistema de tratamento de erros que retorne mensagens de erro claras e significativas para os usuários.
     - Utilizar códigos de status HTTP apropriados para diferentes tipos de falhas.
