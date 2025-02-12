@@ -18,9 +18,9 @@ app = APIRouter()
 
 def all_routes(app):
     app.include_router(router_carros, tags=[Tags.carros], prefix="/api-veiculos/categoria")
-    app.include_router(router_caminhoes, tags=[Tags.caminhoes], prefix="/api-veiculos/categoria")
-    app.include_router(route_motos, tags=[Tags.motos], prefix="/api-veiculos/categoria")
-    app.include_router(routes_auth_auten, tags=[Tags.auth_auten], prefix="/api-veiculos/auten_auth")
+    #app.include_router(router_caminhoes, tags=[Tags.caminhoes], prefix="/api-veiculos/categoria")
+    #app.include_router(route_motos, tags=[Tags.motos], prefix="/api-veiculos/categoria")
+    #app.include_router(routes_auth_auten, tags=[Tags.auth_auten], prefix="/api-veiculos/auten_auth")
 
 
 """

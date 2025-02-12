@@ -3,6 +3,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
+from motor.motor_asyncio import AsyncIOMotorClient
+
 
 
 # Definindo o caminho do banco de dados SQLite
@@ -67,3 +69,10 @@ def get_db_users():
         db_users.close()
 
 
+# banco de dados mongo db
+from motor.motor_asyncio import AsyncIOMotorClient
+
+
+# Conexão com o MongoDB
+client = AsyncIOMotorClient("mongodb://localhost:27017")  # Substitua com sua URL do MongoDB
+db = client.veiculos  # O banco de dados no MongoDB
