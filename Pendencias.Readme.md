@@ -46,7 +46,6 @@
     - Manter a documentação atualizada com exemplos de uso e descrições claras dos endpoints.
 
 - ### Testes Automatizados:
-    - Criar uma suíte de testes automatizados para garantir que a API funcione conforme esperado e para detectar regressões rapidamente.
 
 - ### Tratamento de Erros: (implementado)
     - Implementar um sistema de tratamento de erros que retorne mensagens de erro claras e significativas para os usuários.
