@@ -1,11 +1,10 @@
 from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi import Request, HTTPException
 from starlette.requests import Request
 from starlette.responses import Response
-from starlette.responses import JSONResponse
-import traceback
 import logging
-from fastapi import Request, HTTPException
 import time
+import redis
 
 
 logging.basicConfig(level=logging.INFO)
@@ -27,25 +26,45 @@ class LogRequestMiddleware(BaseHTTPMiddleware):
         return response
     
 
-
-RATE_LIMIT = 65 # Número máximo de requisições por minuto
+# Constantes para o rate limiting
+RATE_LIMIT = 200  # Número máximo de requisições por minuto
 TIME_WINDOW = 60  # Janela de tempo em segundos (1 minuto)
-request_counts = {}  # Dicionário para rastrear o número de requisições por IP
 
+# Inicializa a conexão com o Redis
+redis_client = redis.Redis(host='localhost', port=6379, db=0)  # Conectando ao banco de dados 0
 
-# middleware
+# Middleware para controle de taxa
 async def rate_limit_middleware(request: Request, call_next):
     client_ip = request.client.host
     now = int(time.time())
 
-    if client_ip not in request_counts:
-        request_counts[client_ip] = {"count": 0, "timestamp": now}
+    # Obtém a contagem atual e o timestamp do Redis
+    count = redis_client.get(f"rate_limit:{client_ip}:count")
+    timestamp = redis_client.get(f"rate_limit:{client_ip}:timestamp")
 
-    if now - request_counts[client_ip]["timestamp"] > TIME_WINDOW:
-        request_counts[client_ip] = {"count": 0, "timestamp": now}
+    # Se não houver contagem, inicializa
+    if count is None or timestamp is None:
+        count = 0
+        timestamp = now
+        redis_client.set(f"rate_limit:{client_ip}:count", count)
+        redis_client.set(f"rate_limit:{client_ip}:timestamp", timestamp)
+        redis_client.expire(f"rate_limit:{client_ip}:count", TIME_WINDOW)
+        redis_client.expire(f"rate_limit:{client_ip}:timestamp", TIME_WINDOW)
 
-    if request_counts[client_ip]["count"] >= RATE_LIMIT:
-        remaining_time = TIME_WINDOW - (now - request_counts[client_ip]["timestamp"])
+    count = int(count)
+
+    # Reseta contagem se a janela de tempo tiver expirado
+    if now - int(timestamp) > TIME_WINDOW:
+        count = 0
+        timestamp = now
+        redis_client.set(f"rate_limit:{client_ip}:count", count)
+        redis_client.set(f"rate_limit:{client_ip}:timestamp", timestamp)
+        redis_client.expire(f"rate_limit:{client_ip}:count", TIME_WINDOW)
+        redis_client.expire(f"rate_limit:{client_ip}:timestamp", TIME_WINDOW)
+
+    # Verifica se o limite foi atingido
+    if count >= RATE_LIMIT:
+        remaining_time = TIME_WINDOW - (now - int(timestamp))
         headers = {
             "X-RateLimit-Limit": str(RATE_LIMIT),
             "X-RateLimit-Remaining": "0",
@@ -53,16 +72,20 @@ async def rate_limit_middleware(request: Request, call_next):
         }
         raise HTTPException(status_code=429, detail="Too many requests", headers=headers)
 
-    request_counts[client_ip]["count"] += 1
+    # Incrementa a contagem de requisições
+    count += 1
+    redis_client.set(f"rate_limit:{client_ip}:count", count)
+
     headers = {
         "X-RateLimit-Limit": str(RATE_LIMIT),
-        "X-RateLimit-Remaining": str(RATE_LIMIT - request_counts[client_ip]["count"]),
-        "X-RateLimit-Reset": str(TIME_WINDOW - (now - request_counts[client_ip]["timestamp"]))
+        "X-RateLimit-Remaining": str(RATE_LIMIT - count),
+        "X-RateLimit-Reset": str(TIME_WINDOW - (now - int(timestamp)))
     }
+
+    # Chama o próximo middleware ou rota
     response = await call_next(request)
     response.headers.update(headers)
     return response
-
 """
 # O código define um middleware que intercepta todas as requisições HTTP1.
 # RATE_LIMIT define o número máximo de requisições permitidas por minuto1.

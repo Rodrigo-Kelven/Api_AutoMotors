@@ -16,7 +16,6 @@ os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
 
 
-
 router_carros = APIRouter()
 
 
