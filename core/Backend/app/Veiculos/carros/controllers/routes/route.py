@@ -10,7 +10,7 @@ import os
 
 
 # adicionar validacao e controle de acesso nas rotas, o usuario nao cadastrado e logado somente ver, ao logar, pode criar veiculos e editar seus dados e etc
-router = APIRouter()
+router_carros = APIRouter()
 
 
 # Configura o diretório de templates
@@ -21,7 +21,7 @@ UPLOAD_DIRECTORY = "uploads"
 os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
 # rota POST 
-@router.post(
+@router_carros.post(
         path="/veiculos-leves/",
         status_code=status.HTTP_201_CREATED,
         response_model=CarroInfo,
@@ -76,7 +76,7 @@ async def create_carro(
     return carro
 
 # rota GET
-@router.get(
+@router_carros.get(
         path="/veiculos-leves/",
         status_code=status.HTTP_200_OK,
         response_model=list[CarroInfo],
@@ -92,7 +92,7 @@ async def get_carros():
 
 
 # Rota GET para renderizar o template HTML
-@router.get(
+@router_carros.get(
         path="/veiculos-leves",
         status_code=status.HTTP_200_OK,
         response_description="Renderizaçao da pagina",
@@ -108,7 +108,7 @@ async def read_root(request: Request):
 
 
 # Rota PUT para atualizar um carro
-@router.put(
+@router_carros.put(
     path="/veiculos-leves/{carro_id}",
     status_code=status.HTTP_200_OK,
     response_model=CarroInfo,
@@ -167,7 +167,7 @@ async def update_carro(
     return carro
 
 # Rota DELETE para excluir um carro
-@router.delete(
+@router_carros.delete(
     path="/veiculos-leves/{carro_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     response_description="Delete carro",

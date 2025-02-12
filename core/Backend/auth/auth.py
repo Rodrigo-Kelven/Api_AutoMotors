@@ -5,7 +5,7 @@ from core.Backend.auth.schemas.schemas import  TokenData, User
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta, timezone
 from typing import  Annotated
-import jwt.exceptions
+import jwt
 from fastapi import  Depends, HTTPException, status, Form
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -40,13 +40,21 @@ def authenticate_user(db: Session, username: str, password: str):
 
 # criar token de acesso
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    # Copiando os dados para não modificar o original
     to_encode = data.copy()
+    
+    # Se expires_delta for fornecido, usa o valor. Caso contrário, usa o valor padrão
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    
+    # Adiciona o campo de expiração ao payload
     to_encode.update({"exp": expire})
+    
+    # Codifica o JWT
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    
     return encoded_jwt
 
 
