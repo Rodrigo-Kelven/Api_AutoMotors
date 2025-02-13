@@ -5,7 +5,6 @@ from starlette.requests import Request
 from starlette.responses import Response
 import logging
 import time
-import redis
 
 
 logging.basicConfig(level=logging.INFO)

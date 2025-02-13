@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 from enum import Enum
-import logging
 from core.Backend.app.Veiculos.carros.controllers.routes.route import router_carros
 from core.Backend.app.Veiculos.caminhao.controllers.routes.route import router_caminhoes
 from core.Backend.app.Veiculos.moto.controllers.routes.route import route_motos

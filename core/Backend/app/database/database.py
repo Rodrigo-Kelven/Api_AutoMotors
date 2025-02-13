@@ -1,10 +1,12 @@
 from sqlalchemy.ext.declarative import declarative_base
 from motor.motor_asyncio import AsyncIOMotorClient
-from core.Backend.app.config.config import logger
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+from fastapi import status
 import redis
 import os
+
+
 
 # Conexão com o MongoDB
 client = AsyncIOMotorClient("mongodb://localhost:27017")  # Substitua com sua URL do MongoDB
@@ -37,13 +39,12 @@ engine_automotors_users = create_engine(SQLALCHEMY_DATABASE_api_automotors_users
 # Testando a conexão, db users
 try:
     with engine_automotors_users.connect():
-        logger.info(
-            msg=f"Conexão bem-sucedida!"
-        )
+        print(f"Conexão bem-sucedida!: status {status.HTTP_200_OK}")
+        
 except Exception as e:
-    logger.info(
-        msg=f"Error de conexão, status: {e}!"
-    )
+    print(f"Error de conexão, status: {e}")
+   
+
 
 # Sessão para interagir com o banco de dados, essa sesao é muito importante, ela é responsavel por 'manter uma sessao'
 SessionLocal_users = sessionmaker(autocommit=False, autoflush=False, bind=engine_automotors_users)
