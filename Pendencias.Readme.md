@@ -25,7 +25,7 @@
     - Implementar um sistema de autenticação, como OAuth2 ou JWT, para garantir que apenas usuários autorizados possam acessar a API. 
     - Centralizar a autorização para controlar o acesso a diferentes serviços
 
-- ### Otimização do Roteamento: (implementado)
+- ### Otimização do Roteamento:
     - Utilizar técnicas de balanceamento de carga para distribuir as solicitações entre múltiplos serviços, melhorando a eficiência e a resiliência.
     - Implementação de um mecanismo de fallback para redirecionar solicitações em caso de falha de um serviço.
 
