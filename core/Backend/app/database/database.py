@@ -3,11 +3,15 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from core.Backend.app.config.config import logger
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+import redis
 import os
 
 # Conexão com o MongoDB
 client = AsyncIOMotorClient("mongodb://localhost:27017")  # Substitua com sua URL do MongoDB
 db = client.veiculos  # O banco de dados para veículos em MongoDB
+
+# Conexão com o Redis
+redis_client = redis.Redis(host='localhost', port=6379, db=1)  # Conectando ao banco de dados 0
 
 # Definindo o caminho do banco de dados SQLite
 db_users_path = "./databases/DB_users/db_users/users_users.db" # -> banco de dados de usuarios

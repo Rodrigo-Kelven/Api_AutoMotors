@@ -117,6 +117,11 @@ async def get_carros(carro_id: str):
     if not carro:
         raise HTTPException(status_code=404, detail="Carro não encontrado")
     
+    # logs
+    logger.info(
+        msg=f"Informações do carro: {carro}"
+    )
+
     # Retorna o carro no formato adequado, com o id convertido
     return CarroInfo.from_mongo(carro)
 
@@ -202,6 +207,11 @@ async def update_carro(
     
     # Recupera o carro atualizado
     updated_carro = await db.carros.find_one({"_id": carro_object_id})
+
+    # logs
+    logger.info(
+        msg=f"Carro atualizado: {update_data}"
+    )
     
     # Retorna o carro atualizado como CarroInfo
     return CarroInfo.from_mongo(updated_carro)
