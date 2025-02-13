@@ -39,6 +39,7 @@ async def rate_limit_middleware(request: Request, call_next):
     now = int(time.time())
 
     # Obtém a contagem atual e o timestamp do Redis
+    print("Usando Redis")
     count = redis_client.get(f"rate_limit:{client_ip}:count")
     timestamp = redis_client.get(f"rate_limit:{client_ip}:timestamp")
 

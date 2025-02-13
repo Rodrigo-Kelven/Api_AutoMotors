@@ -4,8 +4,9 @@ from typing import Optional
 from datetime import datetime
 
 
+
 class CaminhaoInfo(BaseModel):
-    id: int
+    id: str
     marca: str
     modelo: str
     ano: int
@@ -21,11 +22,18 @@ class CaminhaoInfo(BaseModel):
     descricao: str
     endereco: str
     imagem: str
-    data_cadastro: datetime
-
+    data_criacao: datetime
 
     class Config:
         orm_mode = True
+        arbitrary_types_allowed = True  # Permite tipos como ObjectId
+
+    @classmethod
+    def from_mongo(cls, document) -> "CaminhaoInfo":
+        # Converte o _id do MongoDB (ObjectId) para string
+        document["id"] = str(document["_id"])
+        return cls(**document)
+    
 
 
 class Veiculo(BaseModel):

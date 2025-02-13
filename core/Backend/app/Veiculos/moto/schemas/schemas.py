@@ -1,18 +1,16 @@
-# app/schemas/schema.py
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 
 
 class MotosInfo(BaseModel):
-    id: int
+    id: str
     marca: str
     modelo: str
     ano: int
     preco: float
-    disponivel: bool
     tipo: str
-    #cap_max: float
+    disponivel: bool
     quilometragem: float 
     cor: str
     lugares: int
@@ -20,11 +18,18 @@ class MotosInfo(BaseModel):
     descricao: str
     endereco: str
     imagem: str
-    data_cadastro: datetime
+    data_criacao: datetime
 
 
     class Config:
         orm_mode = True
+        arbitrary_types_allowed = True  # Permite tipos como ObjectId
+
+    @classmethod
+    def from_mongo(cls, document) -> "MotosInfo":
+        # Converte o _id do MongoDB (ObjectId) para string
+        document["id"] = str(document["_id"])
+        return cls(**document)
 
 
 class Veiculo(BaseModel):

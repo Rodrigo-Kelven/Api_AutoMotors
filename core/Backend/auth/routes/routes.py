@@ -119,12 +119,13 @@ async def get_users(current_user: Annotated[UserResponse , Depends(get_current_a
 
 
 # Atualizar informações do usuário
+# bug ao atualizar
 @routes_auth_auten.put(
-        path="/users/{username}",
-        response_model=UserResponse,
-        response_description="Update informations user",
-        description="Route update informations user",
-        name="Route informations user"
+    path="/users/{username}",
+    response_model=UserResponseUpdate,
+    response_description="Update informations user",
+    description="Route update informations user",
+    name="Route informations user"
 )
 async def update_user(
     username: str, user: UserResponseUpdate, current_user: Annotated[User , Depends(get_current_active_user)]
@@ -133,15 +134,17 @@ async def update_user(
     db_user = get_user(db, username)
     if not db_user:
         db.close()
-        raise HTTPException(status_code=404, detail="User  not found")
+        raise HTTPException(status_code=404, detail="User not found")
     
     for key, value in user.dict(exclude_unset=True).items():
+        print(f"Atualizando atributo: {key} com valor: {value}")  # Adicione este log
         setattr(db_user, key, value)
     
     db.commit()
     db.refresh(db_user)
     db.close()
     return db_user
+
 
 
 # Deletar a conta do usuário somente autenticado

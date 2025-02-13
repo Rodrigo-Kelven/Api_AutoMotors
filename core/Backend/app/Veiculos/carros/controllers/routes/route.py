@@ -1,11 +1,13 @@
 from fastapi import APIRouter, UploadFile, File, Form, status, HTTPException, Request
 from typing import List
+from bson import ObjectId
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
+from core.Backend.app.database.database import db
 from core.Backend.app.Veiculos.carros.models.models import Carro
 from core.Backend.app.Veiculos.carros.schemas.schema import CarroInfo
-from core.Backend.app.database.database import db
 import os
+
 
 # Configura o diretório de templates
 templates = Jinja2Templates(directory="templates")
@@ -13,7 +15,6 @@ templates = Jinja2Templates(directory="templates")
 # Verifica se a pasta existe
 UPLOAD_DIRECTORY = "uploads"
 os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
-
 
 
 router_carros = APIRouter()
@@ -29,20 +30,20 @@ router_carros = APIRouter()
     name="Criar registro para Carro"
 )
 async def create_carro(
-    Marca: str = Form(...),
-    Modelo: str = Form(...),
-    Ano: int = Form(...),
-    Preco: float = Form(...),
-    Tipo: str = Form(...),
-    Disponivel: bool = Form(...),
-    Quilometragem: float = Form(...),
-    Cor: str = Form(...),
-    Portas: int = Form(...),
-    Lugares: int = Form(...),
-    Combustivel: str = Form(...),
-    Descricao: str = Form(...),
-    Endereco: str = Form(...),
-    Imagem: UploadFile = File(...),
+    Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
+    Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
+    Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
+    Preco: float = Form(..., title="Preço do veiculo", alias="Preco", description="Preço do veiculo"),
+    Tipo: str = Form(..., title="Tipo de veiculo", alias="Tipo", description="Tipo do veiculo", example="carro",),
+    Disponivel: bool = Form(..., title="Veiculo disponivel", alias="Disponivel", description="Disponibilidade do veiculo"),
+    Quilometragem: float = Form(..., title="Kilometros rodados", alias="Quilometragem", description="Kilometros rodados"),
+    Cor: str = Form(..., title="Cor do veiculo", alias="Cor", description="Cor do veiculo"),
+    Portas: int = Form(..., title="Numero de portas do veiculo", alias="Portas", description="Numero de portas do veiculo"),
+    Lugares: int = Form(..., title="Capacidade de ocupantes do veiculo", alias="Lugares", description="Quantidade de ocupantes do veiculo"),
+    Combustivel: str = Form(..., title="Combustivel do veiculo", alias="Combustivel", description="Combustivel do veiculo"),
+    Descricao: str = Form(..., title="Descriçao do veiculo", alias="Descricao", description="Descricao do veiculo"),
+    Endereco: str = Form(..., title="Endereco", alias="Endereco", description="Endereco"),
+    Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo")
 ):
     file_location = f"{UPLOAD_DIRECTORY}/{Imagem.filename}"
     with open(file_location, "wb") as file_object:
@@ -71,6 +72,7 @@ async def create_carro(
     
     # Converte para o modelo CarroInfo, incluindo o id
     return CarroInfo.from_mongo(carro_db)
+
 
 # Rota GET para listar todos os carros
 @router_carros.get(
@@ -129,8 +131,6 @@ async def read_root(request: Request):
 
 
 # Rota PUT para atualizar um carro
-from bson import ObjectId
-
 @router_carros.put(
     path="/veiculos-leves/{carro_id}",
     status_code=status.HTTP_200_OK,
