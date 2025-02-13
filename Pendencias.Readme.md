@@ -29,7 +29,7 @@
     - Utilizar técnicas de balanceamento de carga para distribuir as solicitações entre múltiplos serviços, melhorando a eficiência e a resiliência.
     - Implementação de um mecanismo de fallback para redirecionar solicitações em caso de falha de um serviço.
 
-- ### Caching: (implementado)
+- ### Caching:
     - Adicionar caching para respostas frequentes, utilizando Redis ou Memcached, para reduzir a latência e a carga nos serviços de backend.
     - Definir políticas de expiração para garantir que os dados em cache sejam atualizados conforme necessário.
 
