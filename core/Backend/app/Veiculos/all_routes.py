@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-import logging
 from enum import Enum
+import logging
 from core.Backend.app.Veiculos.carros.controllers.routes.route import router_carros
 from core.Backend.app.Veiculos.caminhao.controllers.routes.route import router_caminhoes
 from core.Backend.app.Veiculos.moto.controllers.routes.route import route_motos
@@ -12,7 +12,7 @@ class Tags(Enum):
     motos = "Veiculos Ultra Leves"
     auth_auten = "Autenticação e Autorização"
 
-# /veiculos-pesados/
+
 
 app = APIRouter()
 
@@ -38,13 +38,3 @@ def include_router(
     generate_unique_id_function: (APIRoute) -> str = Default(generate_unique_id)
 ) -> None
 """
-
-def adicionar_route_documentacao(app):
-    # Configuração do logger
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(__name__)
-
-    # Adicione um evento de inicialização para logar a URL
-    @app.on_event("startup")
-    async def startup_event():
-        logger.info("Aplicação iniciada. Acesse a documentação em: http://0.0.0.0:8000/docs")

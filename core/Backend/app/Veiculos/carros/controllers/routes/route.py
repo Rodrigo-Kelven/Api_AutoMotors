@@ -1,12 +1,14 @@
 from fastapi import APIRouter, UploadFile, File, Form, status, HTTPException, Request
-from typing import List
-from bson import ObjectId
+from core.Backend.app.Veiculos.carros.schemas.schema import CarroInfo
+from core.Backend.app.Veiculos.carros.models.models import Carro
+from core.Backend.app.database.database import db
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from core.Backend.app.database.database import db
-from core.Backend.app.Veiculos.carros.models.models import Carro
-from core.Backend.app.Veiculos.carros.schemas.schema import CarroInfo
+from bson import ObjectId
+from typing import List
 import os
+
+from core.Backend.app.config.config import logger
 
 
 # Configura o diretório de templates
@@ -69,7 +71,12 @@ async def create_carro(
     # Salva o carro no MongoDB
     result = await db.carros.insert_one(carro.dict())  # Converte o objeto para um dict
     carro_db = await db.carros.find_one({"_id": result.inserted_id})  # Recupera o carro inserido do banco
-    
+
+    # logs
+    logger.info(
+        msg=f"Carro inserido: {carro_db}"
+    )
+
     # Converte para o modelo CarroInfo, incluindo o id
     return CarroInfo.from_mongo(carro_db)
 
@@ -223,5 +230,10 @@ async def delete_carro(carro_id: str):
 
     # Exclui o carro usando o ObjectId
     await db.carros.delete_one({"_id": carro_object_id})
+
+    # logs
+    logger.info(
+        msg=f"Carro deletado: {carro}"
+    )
 
     return {"detail": "Carro excluído com sucesso"}

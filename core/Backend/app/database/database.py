@@ -1,13 +1,13 @@
-# banco de dados mongo db
-from motor.motor_asyncio import AsyncIOMotorClient
-from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
+from motor.motor_asyncio import AsyncIOMotorClient
+from core.Backend.app.config.config import logger
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
 import os
 
 # Conexão com o MongoDB
 client = AsyncIOMotorClient("mongodb://localhost:27017")  # Substitua com sua URL do MongoDB
-db = client.veiculos  # O banco de dados para veículos
+db = client.veiculos  # O banco de dados para veículos em MongoDB
 
 # Definindo o caminho do banco de dados SQLite
 db_users_path = "./databases/DB_users/db_users/users_users.db" # -> banco de dados de usuarios
@@ -30,9 +30,13 @@ engine_automotors_users = create_engine(SQLALCHEMY_DATABASE_api_automotors_users
 # Testando a conexão, db users
 try:
     with engine_automotors_users.connect():
-        print("Conexão bem-sucedida!")
+        logger.info(
+            msg=f"Conexão bem-sucedida!"
+        )
 except Exception as e:
-    print(f"Erro de conexão: {e}")
+    logger.info(
+        msg=f"Error de conexão, status: {e}!"
+    )
 
 # Sessão para interagir com o banco de dados, essa sesao é muito importante, ela é responsavel por 'manter uma sessao'
 SessionLocal_users = sessionmaker(autocommit=False, autoflush=False, bind=engine_automotors_users)

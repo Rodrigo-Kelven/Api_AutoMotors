@@ -21,7 +21,7 @@ class LogRequestMiddleware(BaseHTTPMiddleware):
         response.headers['X-Process-Time'] = str(process_time)  # Adiciona o tempo de processamento no cabeçalho da resposta
 
         # Loga os detalhes da resposta
-        logging.info(f"Resposta enviada com status {response.status_code}")
+        logging.info(msg=f"Resposta enviada com status {response.status_code}")
         
         return response
     
@@ -39,7 +39,9 @@ async def rate_limit_middleware(request: Request, call_next):
     now = int(time.time())
 
     # Obtém a contagem atual e o timestamp do Redis
+    print("##################")
     print("Usando Redis")
+    print("##################")
     count = redis_client.get(f"rate_limit:{client_ip}:count")
     timestamp = redis_client.get(f"rate_limit:{client_ip}:timestamp")
 
@@ -61,7 +63,9 @@ async def rate_limit_middleware(request: Request, call_next):
         redis_client.set(f"rate_limit:{client_ip}:count", count)
         redis_client.set(f"rate_limit:{client_ip}:timestamp", timestamp)
         redis_client.expire(f"rate_limit:{client_ip}:count", TIME_WINDOW)
-        redis_client.expire(f"rate_limit:{client_ip}:timestamp", TIME_WINDOW)
+        # Removi a linha de expiração do timestamp
+        # Neste caso, o timestamp continuará existindo no Redis, mas ele será sobrescrito quando o contador for zerado novamente, então não há problema em não expirá-lo.
+
 
     # Verifica se o limite foi atingido
     if count >= RATE_LIMIT:
@@ -117,3 +121,12 @@ def cors(app):
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+
+
+# Configurar o registro
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    handlers=[logging.StreamHandler()])
+
+logger = logging.getLogger(__name__)
