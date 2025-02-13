@@ -1,6 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Form, status, HTTPException, Request
 from core.Backend.app.Veiculos.carros.schemas.schema import CarroInfo
 from core.Backend.app.Veiculos.carros.models.models import Carro
+from core.Backend.app.config.config import logger
 from core.Backend.app.database.database import db
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
@@ -8,7 +9,6 @@ from bson import ObjectId
 from typing import List
 import os
 
-from core.Backend.app.config.config import logger
 
 
 # Configura o diretório de templates
