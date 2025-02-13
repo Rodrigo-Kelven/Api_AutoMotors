@@ -16,7 +16,7 @@ db_users_path = "./databases/DB_users/db_users/users_users.db" # -> banco de dad
 # Verificar se a pasta existe, caso contrário, criar
 db_directory_users = os.path.dirname(db_users_path)
 
-
+# verifica se o diretorio existe
 if not os.path.exists(db_directory_users):
     os.makedirs(db_directory_users)  # Cria o diretório se não existir
 
