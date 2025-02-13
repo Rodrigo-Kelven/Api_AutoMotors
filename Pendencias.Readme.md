@@ -50,7 +50,7 @@
     - Considerar implementar versionamento na API para permitir atualizações sem quebrar a compatibilidade com clientes existentes.
     - Utilizar um padrão de URL que inclua a versão, como /api/v1/....
 
-- ### Segurança: (implementado)
+- ### Segurança:
     - Apliquar práticas de segurança, como validação de entrada e proteção contra ataques comuns (ex: SQL Injection, XSS).
     - Considerar o uso de HTTPS para proteger a comunicação entre clientes e a API.
 
