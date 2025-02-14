@@ -1,7 +1,9 @@
+from core.Backend.app.database.database import redis_client_config_rate_limit_middleware
 from starlette.middleware.base import BaseHTTPMiddleware
-import logging
 from fastapi import Request, HTTPException
-from fastapi.responses import JSONResponse
+from starlette.requests import Request
+from starlette.responses import Response
+import logging
 import time
 
 
@@ -9,36 +11,63 @@ logging.basicConfig(level=logging.INFO)
 
 class LogRequestMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
+
         # Loga os detalhes da requisição
         logging.info(f"Requisição recebida: {request.method} {request.url}")
-        
+        start_time = time.time()  # Marcar o tempo de início
+        process_time = time.time() - start_time  # Calcula o tempo de processamento
         # Chama o próximo middleware ou rota
-        response = await call_next(request)
-        
+        response: Response = await call_next(request)  # Chama a próxima parte da solicitação
+        response.headers['X-Process-Time'] = str(process_time)  # Adiciona o tempo de processamento no cabeçalho da resposta
+
         # Loga os detalhes da resposta
-        logging.info(f"Resposta enviada com status {response.status_code}")
+        logging.info(msg=f"Resposta enviada com status {response.status_code}")
         
         return response
     
 
-RATE_LIMIT = 65 # Número máximo de requisições por minuto
+# Constantes para o rate limiting
+RATE_LIMIT = 200  # Número máximo de requisições por minuto
 TIME_WINDOW = 60  # Janela de tempo em segundos (1 minuto)
-request_counts = {}  # Dicionário para rastrear o número de requisições por IP
 
 
-# middleware
+# Middleware para controle de taxa
 async def rate_limit_middleware(request: Request, call_next):
     client_ip = request.client.host
     now = int(time.time())
 
-    if client_ip not in request_counts:
-        request_counts[client_ip] = {"count": 0, "timestamp": now}
+    # Obtém a contagem atual e o timestamp do Redis
+    print("##################")
+    print("Usando Redis")
+    print("##################")
+    count = redis_client_config_rate_limit_middleware.get(f"rate_limit:{client_ip}:count")
+    timestamp = redis_client_config_rate_limit_middleware.get(f"rate_limit:{client_ip}:timestamp")
 
-    if now - request_counts[client_ip]["timestamp"] > TIME_WINDOW:
-        request_counts[client_ip] = {"count": 0, "timestamp": now}
+    # Se não houver contagem, inicializa
+    if count is None or timestamp is None:
+        count = 0
+        timestamp = now
+        redis_client_config_rate_limit_middleware.set(f"rate_limit:{client_ip}:count", count)
+        redis_client_config_rate_limit_middleware.set(f"rate_limit:{client_ip}:timestamp", timestamp)
+        redis_client_config_rate_limit_middleware.expire(f"rate_limit:{client_ip}:count", TIME_WINDOW)
+        redis_client_config_rate_limit_middleware.expire(f"rate_limit:{client_ip}:timestamp", TIME_WINDOW)
 
-    if request_counts[client_ip]["count"] >= RATE_LIMIT:
-        remaining_time = TIME_WINDOW - (now - request_counts[client_ip]["timestamp"])
+    count = int(count)
+
+    # Reseta contagem se a janela de tempo tiver expirado
+    if now - int(timestamp) > TIME_WINDOW:
+        count = 0
+        timestamp = now
+        redis_client_config_rate_limit_middleware.set(f"rate_limit:{client_ip}:count", count)
+        redis_client_config_rate_limit_middleware.set(f"rate_limit:{client_ip}:timestamp", timestamp)
+        redis_client_config_rate_limit_middleware.expire(f"rate_limit:{client_ip}:count", TIME_WINDOW)
+        # Removi a linha de expiração do timestamp
+        # Neste caso, o timestamp continuará existindo no Redis, mas ele será sobrescrito quando o contador for zerado novamente, então não há problema em não expirá-lo.
+
+
+    # Verifica se o limite foi atingido
+    if count >= RATE_LIMIT:
+        remaining_time = TIME_WINDOW - (now - int(timestamp))
         headers = {
             "X-RateLimit-Limit": str(RATE_LIMIT),
             "X-RateLimit-Remaining": "0",
@@ -46,16 +75,20 @@ async def rate_limit_middleware(request: Request, call_next):
         }
         raise HTTPException(status_code=429, detail="Too many requests", headers=headers)
 
-    request_counts[client_ip]["count"] += 1
+    # Incrementa a contagem de requisições
+    count += 1
+    redis_client_config_rate_limit_middleware.set(f"rate_limit:{client_ip}:count", count)
+
     headers = {
         "X-RateLimit-Limit": str(RATE_LIMIT),
-        "X-RateLimit-Remaining": str(RATE_LIMIT - request_counts[client_ip]["count"]),
-        "X-RateLimit-Reset": str(TIME_WINDOW - (now - request_counts[client_ip]["timestamp"]))
+        "X-RateLimit-Remaining": str(RATE_LIMIT - count),
+        "X-RateLimit-Reset": str(TIME_WINDOW - (now - int(timestamp)))
     }
+
+    # Chama o próximo middleware ou rota
     response = await call_next(request)
     response.headers.update(headers)
     return response
-
 """
 # O código define um middleware que intercepta todas as requisições HTTP1.
 # RATE_LIMIT define o número máximo de requisições permitidas por minuto1.
@@ -66,3 +99,32 @@ async def rate_limit_middleware(request: Request, call_next):
 # Se o número de requisições exceder o RATE_LIMIT, uma exceção HTTPException é levantada com o código de status 429 (Too Many Requests)1.
 # Os cabeçalhos X-RateLimit-Limit, X-RateLimit-Remaining e X-RateLimit-Reset são adicionados à resposta para informar o cliente sobre o limite de requisições1.
 """
+
+
+# atualizar e confighurar
+def cors(app):
+    from fastapi.middleware.cors import CORSMiddleware
+
+    origins = [
+        "http://localhost.tiangolo.com",
+        "https://localhost.tiangolo.com",
+        "http://localhost:5173/", # react
+        "http://localhost:8080",
+    ]
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+
+
+# Configurar o registro
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    handlers=[logging.StreamHandler()])
+
+logger = logging.getLogger(__name__)

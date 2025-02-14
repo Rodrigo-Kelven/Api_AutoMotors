@@ -1,15 +1,13 @@
-from fastapi import APIRouter, status, Body, Form, Query, HTTPException, UploadFile, File
-from fastapi import Request, Depends
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
-from sqlalchemy.orm import Session
-from core.Backend.app.database.database import SessionLocal_veiculos, get_db
+from fastapi import APIRouter, UploadFile, File, Form, status, HTTPException, Request, Depends
 from core.Backend.app.Veiculos.caminhao.schemas.schemas import CaminhaoInfo
 from core.Backend.app.Veiculos.caminhao.models.models import Caminhao
+from core.Backend.auth.auth import get_current_user
+from core.Backend.app.config.config import logger
+from core.Backend.app.database.database import db
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
+from bson import ObjectId
 import os
-
-
-router_caminhoes = APIRouter()
 
 
 # Configura o diretório de templates
@@ -20,39 +18,43 @@ UPLOAD_DIRECTORY = "uploads"
 os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
 
+router_caminhoes = APIRouter()
+
 
 # rota POST 
 @router_caminhoes.post(
         path="/veiculos-pesados/",
         status_code=status.HTTP_201_CREATED,
         response_model=CaminhaoInfo,
-        response_description="Informações do caminhão",
-        description="Route para criar registro do caminhão",
-        name="Criar registro para caminhão"
+        response_description="Informaçoes do caminhao",
+        description="Route para criar registro de caminhao",
+        name="Criar registro para Caminhao"
 )
+# dividir por categorias, schema, models, categoria pra cada um
+# rael, esses forms devem estar somente no front, os dados serao enviado em forma de forms diretamente para o db, junto com a imagem
+# entao esses forms dessa rota sairao, ou nao, sla, veremos ao desenrolar do projeto
 async def create_caminhao(
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
     Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
     Preco: float = Form(..., title="Preço do veiculo", alias="Preco", description="Preço do veiculo"),
-    Tipo: str = Form(..., title="Tipo de veiculo", alias="Tipo", description="Tipo do veiculo", example="Caminhão Baú"),
+    Tipo: str = Form(..., title="Tipo de veiculo", alias="Tipo", description="Tipo do veiculo", example="carro",),
     Cap_Maxima: int = Form(..., title="Capacidade máxima do veiculo", alias="Cap_Maxima", description="Capacidade maxima do veículo"),
     Disponivel: bool = Form(..., title="Veiculo disponivel", alias="Disponivel", description="Disponibilidade do veiculo"),
     Quilometragem: float = Form(..., title="Kilometros rodados", alias="Quilometragem", description="Kilometros rodados"),
     Cor: str = Form(..., title="Cor do veiculo", alias="Cor", description="Cor do veiculo"),
     Portas: int = Form(..., title="Numero de portas do veiculo", alias="Portas", description="Numero de portas do veiculo"),
-    Lugares: int = Form(..., title="Capacidade de ocupantes do veiculo", alias="Lugares", description="Quantidade de ocupantesat do veiculo"),
+    Lugares: int = Form(..., title="Capacidade de ocupantes do veiculo", alias="Lugares", description="Quantidade de ocupantes do veiculo"),
     Combustivel: str = Form(..., title="Combustivel do veiculo", alias="Combustivel", description="Combustivel do veiculo"),
     Descricao: str = Form(..., title="Descriçao do veiculo", alias="Descricao", description="Descricao do veiculo"),
     Endereco: str = Form(..., title="Endereco", alias="Endereco", description="Endereco"),
     Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo"),
-    db: Session = Depends(get_db),
+    current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
 ):
     file_location = f"{UPLOAD_DIRECTORY}/{Imagem.filename}"
     with open(file_location, "wb") as file_object:
         file_object.write(await Imagem.read())
     
-
     caminhao = Caminhao(
         marca=Marca,
         modelo=Modelo,
@@ -70,30 +72,13 @@ async def create_caminhao(
         endereco=Endereco,
         imagem=file_location
     )
-    db.add(caminhao)
-    db.commit()
-    db.refresh(caminhao)
-    db.close()
-    return caminhao
 
-
-
-# Rota GET para renderizar o template HTML
-# nao esta funcionando
-@router_caminhoes.get(
-        deprecated=True,
-        path="/veiculos-pesados",
-        status_code=status.HTTP_200_OK,
-        response_description="Renderizaçao pag",
-        description="Renderizacao pag",
-        name="Renderizacao pag",
-        response_class=HTMLResponse
-)
-async def read_root(request: Request):
-    db: Session = SessionLocal_veiculos()
-    carros = db.query(CaminhaoInfo).all()
-    db.close()
-    return templates.TemplateResponse("index.html", {"request": request, "carros": carros})
+    # Salva o caminhao no MongoDB
+    result = await db.caminhao.insert_one(caminhao.dict())  # Converte o objeto para um dict
+    caminhao_db = await db.caminhao.find_one({"_id": result.inserted_id})  # Recupera o carro inserido do banco
+    
+    # Converte para o modelo CaminhaoInfo, incluindo o id
+    return CaminhaoInfo.from_mongo(caminhao_db)
 
 
 # rota GET
@@ -101,96 +86,198 @@ async def read_root(request: Request):
         path="/veiculos-pesados/",
         status_code=status.HTTP_200_OK,
         response_model=list[CaminhaoInfo],
-        response_description="Informações do caminhão",
-        description="Route para pegar informações do caminhâo",
-        name="Pegar informações do caminhão"
+        response_description="Informaçoes do caminhao",
+        description="Route para pegar informacoes do caminhao",
+        name="Pegar informacoes do Caminhao"
 )
-async def list_veiculos():
-    db: Session = SessionLocal_veiculos()
-    caminhao = db.query(Caminhao).all()
-    db.close()
-    return caminhao
+async def get_caminhao():
+    caminhao_cursor = db.caminhao.find()
+    caminhao = [CaminhaoInfo.from_mongo(caminhao) for caminhao in await caminhao_cursor.to_list(length=100)]
+    
+    if caminhao:
+        logger.info(
+            msg="Caminhoes sendo listados!"
+        )
+        return caminhao
+    
+    if not caminhao:
+        logger.error(
+            msg="Nenhum caminhao inserido!"
+            )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nenhum caminhao inserido!")
 
 
-# Rota PUT para atualizar um carro
-@router_caminhoes.put(
-    path="/veiculos-pesados/{veiculo_id}",
+
+
+@router_caminhoes.get(
+    path="/veiculos-pesados/{caminhao_id}",
     status_code=status.HTTP_200_OK,
     response_model=CaminhaoInfo,
-    response_description="Update informações de caminhão",
-    description="Route update informações de caminhão",
-    name ="Atualizar informações do caminhão"
+    response_description="Informações dos caminhao",
+    description="Route para pegar informações do caminhao",
+    name="Pegar informações do Caminhao"
+)
+async def get_carros(caminhao_id: str):
+    try:
+        # Tenta converter o caminhao_id para ObjectId, porque o MongoDB trabalha com objetos!
+        caminhao_object_id = ObjectId(caminhao_id)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de caminhao inválido")
+
+    # Busca o caminhao no banco de dados
+    caminhao = await db.caminhao.find_one({"_id": caminhao_object_id})
+
+    if not caminhao:
+        logger.info(
+            msg="Caminhao não encontrado!"
+        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Caminhao não encontrado!")
+    
+    logger.info(
+        msg=f"Informações da caminhao: {caminhao["_id"]}"
+    )
+    # Retorna o caminhao no formato adequado, com o id convertido
+    return CaminhaoInfo.from_mongo(caminhao)
+
+
+# Rota GET para renderizar o template HTML
+@router_caminhoes.get(
+        path="/veiculos-pesados/page/",
+        status_code=status.HTTP_200_OK,
+        response_description="Renderizaçao da pagina",
+        description="Renderizacao de pagina",
+        name="Renderizacao da pagina",
+        response_class=HTMLResponse
+)
+async def read_root(request: Request):
+    caminhao_cursor = db.caminhao.find()
+    caminhao = [CaminhaoInfo.from_mongo(caminhao) for caminhao in await caminhao_cursor.to_list(length=100)]
+    
+    logger.info(
+        msg="Pagina de veiculos pesados: caminhões!"
+    )
+    return templates.TemplateResponse("index.html", {"request": request, "carros": caminhao})
+
+
+# Rota PUT para atualizar um caminhao
+@router_caminhoes.put(
+    path="/veiculos-pesados/{caminhao_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=CaminhaoInfo,
+    response_description="Informções atualizadas",
+    description="Route update informações do Caminhao",
+    name ="Atualizar informações do Caminhao"
 )
 async def update_caminhao(
-    veiculo_id: int,
+    caminhao_id: str,
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
     Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
     Preco: float = Form(..., title="Preço do veiculo", alias="Preco", description="Preço do veiculo"),
-    Tipo: str = Form(..., title="Tipo de veiculo", alias="Tipo", description="Tipo do veiculo", example="Caminhão Baú"),
+    Tipo: str = Form(..., title="Tipo de veiculo", alias="Tipo", description="Tipo do veiculo", example="carro",),
     Cap_Maxima: int = Form(..., title="Capacidade máxima do veiculo", alias="Cap_Maxima", description="Capacidade maxima do veículo"),
     Disponivel: bool = Form(..., title="Veiculo disponivel", alias="Disponivel", description="Disponibilidade do veiculo"),
     Quilometragem: float = Form(..., title="Kilometros rodados", alias="Quilometragem", description="Kilometros rodados"),
     Cor: str = Form(..., title="Cor do veiculo", alias="Cor", description="Cor do veiculo"),
     Portas: int = Form(..., title="Numero de portas do veiculo", alias="Portas", description="Numero de portas do veiculo"),
-    Lugares: int = Form(..., title="Capacidade de ocupantes do veiculo", alias="Lugares", description="Quantidade de ocupantesat do veiculo"),
+    Lugares: int = Form(..., title="Capacidade de ocupantes do veiculo", alias="Lugares", description="Quantidade de ocupantes do veiculo"),
     Combustivel: str = Form(..., title="Combustivel do veiculo", alias="Combustivel", description="Combustivel do veiculo"),
     Descricao: str = Form(..., title="Descriçao do veiculo", alias="Descricao", description="Descricao do veiculo"),
     Endereco: str = Form(..., title="Endereco", alias="Endereco", description="Endereco"),
-    Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo")
+    Imagem: UploadFile = File(None, title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo"),
+    current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
 ):
-    db: Session = SessionLocal_veiculos()
-    caminhao = db.query(Caminhao).filter(Caminhao.id == veiculo_id).first()
+
+    try:
+        # Tenta converter o caminhao_id para ObjectId, porque o MongoDB trabalha com objetos!
+        caminhao_object_id = ObjectId(caminhao_id)
+    except Exception as e:
+        logger.error(
+            msg="ID de caminhao inválido!"
+        )
+        raise HTTPException(status_code=400, detail="ID de caminhao inválido!")
+
+    # Busca o caminhao no banco de dados
+    caminhao = await db.caminhao.find_one({"_id": caminhao_object_id})
 
     if not caminhao:
-        db.close()
-        raise HTTPException(status_code=404, detail="Caminhão não encontrado")
+        logger.info(
+            msg="Caminhao não encontrado!"
+        )
+        raise HTTPException(status_code=404, detail="Caminhao não encontrado!")
 
-    caminhao.marca = Marca
-    caminhao.modelo = Modelo
-    caminhao.ano = Ano
-    caminhao.preco = Preco
-    caminhao.disponivel = Disponivel
-    caminhao.tipo = Tipo
-    caminhao.cap_maxima = Cap_Maxima
-    caminhao.quilometragem = Quilometragem
-    caminhao.cor = Cor
-    caminhao.portas = Portas
-    caminhao.lugares = Lugares
-    caminhao.combustivel = Combustivel
-    caminhao.descricao = Descricao
-    caminhao.endereco = Endereco
-    
+    update_data = {
+        "marca": Marca,
+        "modelo": Modelo,
+        "ano": Ano,
+        "preco": Preco,
+        "disponivel": Disponivel,
+        "tipo": Tipo,
+        "cap_maxima": Cap_Maxima,
+        "quilometragem": Quilometragem,
+        "cor": Cor,
+        "portas": Portas,
+        "lugares": Lugares,
+        "combustivel": Combustivel,
+        "descricao": Descricao,
+        "endereco": Endereco,
+    }
 
     if Imagem:
         file_location = f"{UPLOAD_DIRECTORY}/{Imagem.filename}"
         with open(file_location, "wb") as file_object:
             file_object.write(await Imagem.read())
-        caminhao.imagem = file_location
+        update_data["imagem"] = file_location
 
-    db.commit()
-    db.refresh(caminhao)
-    db.close()
-    return caminhao
+    # Atualiza o caminhao no banco de dados
+    await db.caminhao.update_one({"_id": caminhao_object_id}, {"$set": update_data})
+    
+    # Recupera o caminhao atualizado
+    updated_caminhao = await db.caminhao.find_one({"_id": caminhao_object_id})
+    
+    logger.info(
+        msg=f"Caminhao atualizado: {updated_caminhao["_id"]}"
+    )
+
+    # Retorna o caminhao atualizado como CaminhaoInfo
+    return CaminhaoInfo.from_mongo(updated_caminhao)
+
 
 
 # Rota DELETE para excluir um carro
 @router_caminhoes.delete(
-    path="/veiculos-pesados/{veiculo_id}",
+    path="/veiculos-pesados/{caminhao_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    response_description="Delete caminhão",
-    description="Route delete caminhão",
-    name="Delete caminhão"
+    response_description="Delete caminhao",
+    description="Route delete caminhao",
+    name="Delete Carro"
 )
-async def delete_carro(carro_id: int,):
-    db: Session = SessionLocal_veiculos()
-    carro = db.query(Caminhao).filter(Caminhao.id == carro_id).first()
+async def delete_carro(
+    caminhao_id: str,
+    current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
+    ):
+    try:
+        # Tenta converter caminhao_id para ObjectId, porque o MongoDB trabalha com objetos!
+        carro_object_id = ObjectId(caminhao_id)
+    except Exception as e:
+        logger.error(
+            msg="Id caminhao invalido!"
+        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de caminhao inválido!")
 
-    if not carro:
-        db.close()
-        raise HTTPException(status_code=404, detail="Caminhão não encontrado")
+    # Busca o caminhao no banco de dados
+    caminhao = await db.caminhao.find_one({"_id": carro_object_id})
 
-    db.delete(carro)
-    db.commit()
-    db.close()
-    return {"detail": "Caminhão excluído com sucesso"}
+    if not caminhao:
+        logger.info(
+            msg="Caminhao não encontrado!"
+        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Caminhao não encontrado!")
+
+    # Exclui o caminhao usando o ObjectId
+    await db.caminhao.delete_one({"_id": carro_object_id})
+
+    logger.info(
+        msg=f"Caminhao excluído com sucesso!: {caminhao["_id"]}"
+    )
+    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="Caminhao excluido com sucesso!")
