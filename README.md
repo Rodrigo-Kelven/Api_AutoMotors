@@ -12,7 +12,8 @@ Ele permite que os usuários realizem operações como criar, ler, atualizar e e
 - [FastAPI](https://fastapi.tiangolo.com/) - Framework para construção de APIs
 - [SQLAlchemy](https://www.sqlalchemy.org/) - ORM para interagir com o banco de dados
 - [SQLite](https://www.sqlite.org/index.html) - Banco de dados leve (temporariamente para usuarios)
-- [MongoDB](https://hub.docker.com/_/mongo) - Banco de dados NoSQL 
+- [MongoDB](https://hub.docker.com/_/mongo) - Banco de dados NoSQL
+- [Redis](https://hub.docker.com/_/redis) - Banco de dados Caching
 - [Pydantic](https://pydantic-docs.helpmanual.io/) - Validação de dados
 - [Docker](https://www.docker.com/) - Conteirização da aplicação
 
