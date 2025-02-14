@@ -1,11 +1,10 @@
-from core.Backend.auth.models.models import UserDB
-from core.Backend.app.database.database import SessionLocal_users, get_db_users
-from core.Backend.auth.schemas.schemas import Token, User, UserResponse, UserResponseUpdate
-from typing import List, Annotated
 from fastapi import APIRouter, Depends, HTTPException, status, Form, BackgroundTasks, Body
-from core.Backend.auth.auth import *
-
+from core.Backend.auth.schemas.schemas import Token, User, UserResponse, UserResponseUpdate
+from core.Backend.app.database.database import SessionLocal_users, get_db_users
 from fastapi.security import OAuth2PasswordRequestForm
+from core.Backend.auth.models.models import UserDB
+from typing import List, Annotated
+from core.Backend.auth.auth import *
 
 # caso queira entender como funciona, recomendo desenhar o fluxo
 routes_auth_auten = APIRouter()

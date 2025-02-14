@@ -1,10 +1,12 @@
 # app/models/models.py
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 
 
 # Modelo para a coleção de carros no MongoDB
 class Carro(BaseModel):
+    id: Optional[int] = None
     marca: str
     modelo: str
     ano: int

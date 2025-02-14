@@ -26,24 +26,7 @@ app.add_middleware(LogRequestMiddleware)
 app.middleware("http")(rate_limit_middleware)
 
 # adicionar CORS para implementacao com o frontend
-#cors(app)
+cors(app)
 
 
-@app.get("/")
-def read_root():
-    logger.info(
-        msg="Endpoint raiz acessado"
-        )
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int):
-    logger.debug(f"Item solicitado: {item_id}")
-    if item_id > 10:
-        logger.error(
-            msg="ID do item é muito alto",
-            stacklevel=1
-            )
-    return {"item_id": item_id}
 

@@ -1,7 +1,7 @@
 from core.Backend.auth.config.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, pwd_context, oauth2_scheme
 from core.Backend.app.database.database import  SessionLocal_users
 from core.Backend.auth.schemas.schemas import  TokenData, User
-from fastapi import  Depends, HTTPException, status, Form
+from fastapi import  Depends, HTTPException, status
 from core.Backend.auth.models.models import UserDB
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
@@ -87,5 +87,5 @@ async def get_current_active_user(
     current_user: Annotated[User , Depends(get_current_user)],
 ):
     if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
     return current_user

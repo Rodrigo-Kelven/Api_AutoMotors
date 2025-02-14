@@ -1,6 +1,7 @@
-from fastapi import APIRouter, UploadFile, File, Form, status, HTTPException, Request
+from fastapi import APIRouter, UploadFile, File, Form, status, HTTPException, Request, Depends
 from core.Backend.app.Veiculos.carros.schemas.schema import CarroInfo
 from core.Backend.app.Veiculos.carros.models.models import Carro
+from core.Backend.auth.auth import get_current_user
 from core.Backend.app.config.config import logger
 from core.Backend.app.database.database import db
 from fastapi.templating import Jinja2Templates
@@ -8,7 +9,6 @@ from fastapi.responses import HTMLResponse
 from bson import ObjectId
 from typing import List
 import os
-
 
 
 # Configura o diretório de templates
@@ -45,7 +45,8 @@ async def create_carro(
     Combustivel: str = Form(..., title="Combustivel do veiculo", alias="Combustivel", description="Combustivel do veiculo"),
     Descricao: str = Form(..., title="Descriçao do veiculo", alias="Descricao", description="Descricao do veiculo"),
     Endereco: str = Form(..., title="Endereco", alias="Endereco", description="Endereco"),
-    Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo")
+    Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo"),
+    current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
 ):
     file_location = f"{UPLOAD_DIRECTORY}/{Imagem.filename}"
     with open(file_location, "wb") as file_object:
@@ -68,13 +69,15 @@ async def create_carro(
         imagem=file_location,
     )
 
+
     # Salva o carro no MongoDB
     result = await db.carros.insert_one(carro.dict())  # Converte o objeto para um dict
     carro_db = await db.carros.find_one({"_id": result.inserted_id})  # Recupera o carro inserido do banco
 
+
     # logs
     logger.info(
-        msg=f"Carro inserido: {carro_db}"
+        msg=f"Carro inserido: {carro_db["_id"]}"
     )
 
     # Converte para o modelo CarroInfo, incluindo o id
@@ -91,9 +94,21 @@ async def create_carro(
     name="Pegar informações do Carro"
 )
 async def get_carros():
+
     carros_cursor = db.carros.find()
     carros = [CarroInfo.from_mongo(carro) for carro in await carros_cursor.to_list(length=100)]
-    return carros
+    
+    if carros:
+        logger.info(
+            msg="Carros sendo listados!"
+        )
+        return carros
+    
+    if not carros:
+        logger.info(
+            msg="Nenhum carro inserido!"
+        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nenhum carro inserido!")
 
 
 @router_carros.get(
@@ -108,18 +123,25 @@ async def get_carros(carro_id: str):
     try:
         # Tenta converter o carro_id para ObjectId, porque o MongoDB trabalha com objetos!
         carro_object_id = ObjectId(carro_id)
+
     except Exception as e:
-        raise HTTPException(status_code=400, detail="ID de carro inválido")
+        logger.error(
+            msg="ID de carro inválido!"
+        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de carro inválido!")
 
     # Busca o carro no banco de dados
     carro = await db.carros.find_one({"_id": carro_object_id})
 
     if not carro:
-        raise HTTPException(status_code=404, detail="Carro não encontrado")
+        logger.error(
+            msg="Carro não encontrado!"
+        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Carro não encontrado!")
     
     # logs
     logger.info(
-        msg=f"Informações do carro: {carro}"
+        msg=f"Informações do carro: {carro["_id"]}"
     )
 
     # Retorna o carro no formato adequado, com o id convertido
@@ -153,32 +175,39 @@ async def read_root(request: Request):
 )
 async def update_carro(
     carro_id: str,
-    Marca: str = Form(...),
-    Modelo: str = Form(...),
-    Ano: int = Form(...),
-    Preco: float = Form(...),
-    Tipo: str = Form(...),
-    Disponivel: bool = Form(...),
-    Quilometragem: float = Form(...),
-    Cor: str = Form(...),
-    Portas: int = Form(...),
-    Lugares: int = Form(...),
-    Combustivel: str = Form(...),
-    Descricao: str = Form(...),
-    Endereco: str = Form(...),
-    Imagem: UploadFile = File(None),
+    Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
+    Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
+    Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
+    Preco: float = Form(..., title="Preço do veiculo", alias="Preco", description="Preço do veiculo"),
+    Tipo: str = Form(..., title="Tipo de veiculo", alias="Tipo", description="Tipo do veiculo", example="carro",),
+    Disponivel: bool = Form(..., title="Veiculo disponivel", alias="Disponivel", description="Disponibilidade do veiculo"),
+    Quilometragem: float = Form(..., title="Kilometros rodados", alias="Quilometragem", description="Kilometros rodados"),
+    Cor: str = Form(..., title="Cor do veiculo", alias="Cor", description="Cor do veiculo"),
+    Portas: int = Form(..., title="Numero de portas do veiculo", alias="Portas", description="Numero de portas do veiculo"),
+    Lugares: int = Form(..., title="Capacidade de ocupantes do veiculo", alias="Lugares", description="Quantidade de ocupantes do veiculo"),
+    Combustivel: str = Form(..., title="Combustivel do veiculo", alias="Combustivel", description="Combustivel do veiculo"),
+    Descricao: str = Form(..., title="Descriçao do veiculo", alias="Descricao", description="Descricao do veiculo"),
+    Endereco: str = Form(..., title="Endereco", alias="Endereco", description="Endereco"),
+    Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo"),
+    current_user: str = Depends(get_current_user)
 ):
     try:
         # Tenta converter o carro_id para ObjectId, porque o MongoDB trabalha com objetos!
         carro_object_id = ObjectId(carro_id)
     except Exception as e:
-        raise HTTPException(status_code=400, detail="ID de carro inválido")
+        logger.error(
+            msg="ID de carro inválido!"
+        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de carro inválido!")
 
     # Busca o carro no banco de dados
     carro = await db.carros.find_one({"_id": carro_object_id})
 
     if not carro:
-        raise HTTPException(status_code=404, detail="Carro não encontrado")
+        logger.error(
+            msg="Carro não encontrado!"
+        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Carro não encontrado")
 
     update_data = {
         "marca": Marca,
@@ -210,7 +239,7 @@ async def update_carro(
 
     # logs
     logger.info(
-        msg=f"Carro atualizado: {update_data}"
+        msg=f"Carro atualizado: {updated_carro["_id"]}"
     )
     
     # Retorna o carro atualizado como CarroInfo
@@ -225,25 +254,34 @@ async def update_carro(
     description="Route delete carro",
     name="Delete Carro"
 )
-async def delete_carro(carro_id: str):
+async def delete_carro(
+    carro_id: str,
+    current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
+    ):
     try:
         # Tenta converter o carro_id para ObjectId, porque o MongoDB trabalha com objetos!
         carro_object_id = ObjectId(carro_id)
     except Exception as e:
-        raise HTTPException(status_code=400, detail="ID de carro inválido")
+        logger.error(
+            msg="ID de carro inválido!"
+        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de carro inválido!")
 
     # Busca o carro no banco de dados
     carro = await db.carros.find_one({"_id": carro_object_id})
 
     if not carro:
-        raise HTTPException(status_code=404, detail="Carro não encontrado")
+        logger.error(
+            msg="Carro não encontrado!"
+        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Carro não encontrado!")
 
     # Exclui o carro usando o ObjectId
     await db.carros.delete_one({"_id": carro_object_id})
 
     # logs
     logger.info(
-        msg=f"Carro deletado: {carro}"
+        msg=f"Carro deletado: {carro["_id"]}"
     )
 
     return {"detail": "Carro excluído com sucesso"}
