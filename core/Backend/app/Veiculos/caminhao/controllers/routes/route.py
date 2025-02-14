@@ -159,7 +159,7 @@ async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "carros": caminhao})
 
 
-# Rota PUT para atualizar um carro
+# Rota PUT para atualizar um caminhao
 @router_caminhoes.put(
     path="/veiculos-pesados/{caminhao_id}",
     status_code=status.HTTP_200_OK,
