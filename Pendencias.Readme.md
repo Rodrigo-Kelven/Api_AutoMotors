@@ -33,7 +33,7 @@
     - Adicionar caching para respostas frequentes, utilizando Redis ou Memcached, para reduzir a latência e a carga nos serviços de backend.
     - Definir políticas de expiração para garantir que os dados em cache sejam atualizados conforme necessário.
 
-- ### Monitoramento e Logging: (60% implementado)
+- ### Monitoramento e Logging:
     - Integrar ferramentas de monitoramento, como Prometheus ou Grafana, para acompanhar o desempenho da API e identificar gargalos.
           - Middleware implementado.
     - Implementar um sistema de logging detalhado para registrar erros e eventos importantes, facilitando a depuração.
