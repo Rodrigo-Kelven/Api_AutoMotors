@@ -47,7 +47,7 @@ async def create_carro(
     Descricao: str = Form(..., title="Descriçao do veiculo", alias="Descricao", description="Descricao do veiculo"),
     Endereco: str = Form(..., title="Endereco", alias="Endereco", description="Endereco"),
     Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo"),
-    #current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
+    current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
 ):
     # Salva a imagem no diretório uploads
 
