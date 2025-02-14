@@ -22,6 +22,7 @@ os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 router_carros = APIRouter()
 
 
+
 # Rota POST para criar um carro
 @router_carros.post(
     path="/veiculos-leves/",
@@ -46,9 +47,11 @@ async def create_carro(
     Descricao: str = Form(..., title="Descriçao do veiculo", alias="Descricao", description="Descricao do veiculo"),
     Endereco: str = Form(..., title="Endereco", alias="Endereco", description="Endereco"),
     Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo"),
-    current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
+    #current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
 ):
-    file_location = f"{UPLOAD_DIRECTORY}/{Imagem.filename}"
+    # Salva a imagem no diretório uploads
+
+    file_location = os.path.join(UPLOAD_DIRECTORY, Imagem.filename)
     with open(file_location, "wb") as file_object:
         file_object.write(await Imagem.read())
     
@@ -66,7 +69,7 @@ async def create_carro(
         combustivel=Combustivel,
         descricao=Descricao,
         endereco=Endereco,
-        imagem=file_location,
+        imagem="uploads/" + Imagem.filename,
     )
 
 
@@ -150,8 +153,7 @@ async def get_carros(carro_id: str):
 
 # Rota GET para renderizar o template HTML
 @router_carros.get(
-    deprecated=True,
-    path="/veiculos-leves",
+    path="/veiculos-leves/page/",
     status_code=status.HTTP_200_OK,
     response_description="Renderização da página",
     description="Renderização de página",
@@ -161,6 +163,10 @@ async def get_carros(carro_id: str):
 async def read_root(request: Request):
     carros_cursor = db.carros.find()
     carros = [CarroInfo.from_mongo(carro) for carro in await carros_cursor.to_list(length=100)]
+
+    logger.info(
+        msg="Pagina de veiculos leves: carros!"
+    )
     return templates.TemplateResponse("index.html", {"request": request, "carros": carros})
 
 

@@ -2,60 +2,147 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Concessionária de Automóveis</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        form { margin: 20px; }
-        img { max-width: 200px; }
-        .carro { margin-bottom: 20px; }
-    </style>
+    <title>Upload de Imagem</title>
 </head>
 <body>
-    <h1>Adicionar Carro</h1>
-    <form id="carForm" enctype="multipart/form-data">
-        <input type="text" name="modelo" placeholder="Modelo" required>
-        <input type="number" name="ano" placeholder="Ano" required>
-        <input type="number" name="preco" placeholder="Preço" required>
-        <input type="file" name="imagem" required>
-        <button type="submit">Adicionar Carro</button>
+    <h1>Cadastro de Carros</h1>
+
+    <form action="/api-veiculos/categoria/veiculos-leves/" method="POST" enctype="multipart/form-data">
+        <input type="text" name="Marca" placeholder="Marca" required>
+        <input type="text" name="Modelo" placeholder="Modelo" required>
+        <input type="number" name="Ano" placeholder="Ano" required>
+        <input type="number" name="Preco" placeholder=" Preço" required>
+        <input type="text" name="Tipo" placeholder="Tipo" required>
+        <input type="checkbox" name="Disponivel" value="true"> Disponível
+        <input type="number" name="Quilometragem" placeholder="Quilometragem" required>
+        <input type="text" name="Cor" placeholder="Cor" required>
+        <input type="number" name="Portas" placeholder="Número de Portas" required>
+        <input type="number" name="Lugares" placeholder="Capacidade de Ocupantes" required>
+        <input type="text" name="Combustivel" placeholder="Combustível" required>
+        <textarea name="Descricao" placeholder="Descrição" required></textarea>
+        <input type="text" name="Endereco" placeholder="Endereço" required>
+        <input type="file" name="Imagem" required>
+        <button type="submit">Cadastrar Carro</button>
     </form>
-    
-    <h2>Carros Adicionados</h2>
-    <div id="carros"></div>
 
-    <script>
-        document.getElementById('carForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const response = await fetch('/carros/', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await response.json();
-            addCarroToDOM(data);
-            e.target.reset();
-        };
-
-        async function loadCarros() {
-            const response = await fetch('/api-veiculos/categoria/carros/');
-            const carros = await response.json();
-            carros.forEach(addCarroToDOM);
-        }
-
-        function addCarroToDOM(carro) {
-            document.getElementById('carros').innerHTML += `
-                <div class="carro">
-                    <h3>${carro.modelo}</h3>
-                    <p>Ano: ${carro.ano}</p>
-                    <p>Preço: R$ ${carro.preco.toFixed(2)}</p>
-                    <img src="${carro.imagem}" alt="${carro.modelo}">
-                </div>
-            `;
-        }
-
-        // Carregar carros ao iniciar a página
-        loadCarros();
-    </script>
+    <h2>Imagens Enviadas</h2>
+    <ul id="image-list">
+        <!-- A lista de imagens será preenchida aqui -->
+        {% for carro in carros %}
+            <li>
+                <h3>{{ carro.marca }} {{ carro.modelo }} ({{ carro.ano }})</h3>
+                <p>Preço: R$ {{ carro.preco }}</p>
+                <p>Disponível: {{ carro.disponivel }}</p>
+                <p>Quilometragem: {{ carro.quilometragem }} km</p>
+                <p>Cor: {{ carro.cor }}</p>
+                <p>Portas: {{ carro.portas }}</p>
+                <p>Lugares: {{ carro.lugares }}</p>
+                <p>Combustível: {{ carro.combustivel }}</p>
+                <p>Descrição: {{ carro.descricao }}</p>
+                <p>Endereço: {{ carro.endereco }}</p>
+                <img src="/{{ carro.imagem }}" alt="Imagem do carro">
+            </li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
+
+<!-- pagina mais aprimorada, é a mesma coisa!!!
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload de Imagem</title>
+    <script>
+        // Função para enviar o formulário via AJAX
+        function submitForm(event) {
+            event.preventDefault();  // Impede o envio tradicional do formulário
+
+            const form = event.target;
+            const formData = new FormData(form);  // Cria um FormData com os dados do formulário
+
+            // Faz a requisição AJAX para enviar os dados
+            fetch('/api-veiculos/categoria/veiculos-leves/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())  // Aguarda a resposta como JSON
+            .then(data => {
+                if (data) {
+                    // Atualiza a lista de carros
+                    updateCarList(data);
+                    form.reset();  // Limpa o formulário
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao enviar o formulário:', error);
+            });
+        }
+
+        // Função para atualizar a lista de carros com os novos dados
+        function updateCarList(carros) {
+            const imageList = document.getElementById('image-list');
+            imageList.innerHTML = '';  // Limpa a lista existente
+
+            carros.forEach(carro => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <h3>${carro.marca} ${carro.modelo} (${carro.ano})</h3>
+                    <p>Preço: R$ ${carro.preco}</p>
+                    <p>Disponível: ${carro.disponivel}</p>
+                    <p>Quilometragem: ${carro.quilometragem} km</p>
+                    <p>Cor: ${carro.cor}</p>
+                    <p>Portas: ${carro.portas}</p>
+                    <p>Lugares: ${carro.lugares}</p>
+                    <p>Combustível: ${carro.combustivel}</p>
+                    <p>Descrição: ${carro.descricao}</p>
+                    <p>Endereço: ${carro.endereco}</p>
+                    <img src="/${carro.imagem}" alt="Imagem do carro">
+                `;
+                imageList.appendChild(li);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Cadastro de Carros</h1>
+
+    <form id="car-form" onsubmit="submitForm(event)" enctype="multipart/form-data">
+        <input type="text" name="Marca" placeholder="Marca" required>
+        <input type="text" name="Modelo" placeholder="Modelo" required>
+        <input type="number" name="Ano" placeholder="Ano" required>
+        <input type="number" name="Preco" placeholder="Preço" required>
+        <input type="text" name="Tipo" placeholder="Tipo" required>
+        <input type="checkbox" name="Disponivel" value="true"> Disponível
+        <input type="number" name="Quilometragem" placeholder="Quilometragem" required>
+        <input type="text" name="Cor" placeholder="Cor" required>
+        <input type="number" name="Portas" placeholder="Número de Portas" required>
+        <input type="number" name="Lugares" placeholder="Capacidade de Ocupantes" required>
+        <input type="text" name="Combustivel" placeholder="Combustível" required>
+        <textarea name="Descricao" placeholder="Descrição" required></textarea>
+        <input type="text" name="Endereco" placeholder="Endereço" required>
+        <input type="file" name="Imagem" required>
+        <button type="submit">Cadastrar Carro</button>
+    </form>
+
+    <h2>Imagens Enviadas</h2>
+    <ul id="image-list">
+        {% for carro in carros %}
+            <li>
+                <h3>{{ carro.marca }} {{ carro.modelo }} ({{ carro.ano }})</h3>
+                <p>Preço: R$ {{ carro.preco }}</p>
+                <p>Disponível: {{ carro.disponivel }}</p>
+                <p>Quilometragem: {{ carro.quilometragem }} km</p>
+                <p>Cor: {{ carro.cor }}</p>
+                <p>Portas: {{ carro.portas }}</p>
+                <p>Lugares: {{ carro.lugares }}</p>
+                <p>Combustível: {{ carro.combustivel }}</p>
+                <p>Descrição: {{ carro.descricao }}</p>
+                <p>Endereço: {{ carro.endereco }}</p>
+                <img src="/{{ carro.imagem }}" alt="Imagem do carro">
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+-->

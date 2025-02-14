@@ -133,10 +133,8 @@ async def list_veiculos(moto_id: str):
 
 
 # Rota GET para renderizar o template HTML
-# nao esta funcionando
 @route_motos.get(
-        deprecated=True,
-        path="/veiculos-ultra-leves/",
+        path="/veiculos-ultra-leves/page/",
         status_code=status.HTTP_200_OK,
         response_description="Informações da Moto",
         description="Route para renderizar pagina",
@@ -146,6 +144,10 @@ async def list_veiculos(moto_id: str):
 async def read_root(request: Request):
     motos_cursor = db.motos.find()
     motos = [MotosInfo.from_mongo(moto) for moto in await motos_cursor.to_list(length=100)]
+
+    logger.info(
+        msg="Pagina de veiculos ultra leves: motos!"
+    )
     return templates.TemplateResponse("index.html", {"request": request, "carros": motos})
 
 

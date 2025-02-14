@@ -13,7 +13,6 @@ import os
 # Configura o diretório de templates
 templates = Jinja2Templates(directory="templates")
 
-
 # verifica se a pasta existe
 UPLOAD_DIRECTORY = "uploads"
 os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
@@ -143,8 +142,7 @@ async def get_carros(caminhao_id: str):
 
 # Rota GET para renderizar o template HTML
 @router_caminhoes.get(
-        deprecated=True,
-        path="/veiculos-pesados",
+        path="/veiculos-pesados/page/",
         status_code=status.HTTP_200_OK,
         response_description="Renderizaçao da pagina",
         description="Renderizacao de pagina",
@@ -154,6 +152,10 @@ async def get_carros(caminhao_id: str):
 async def read_root(request: Request):
     caminhao_cursor = db.caminhao.find()
     caminhao = [CaminhaoInfo.from_mongo(caminhao) for caminhao in await caminhao_cursor.to_list(length=100)]
+    
+    logger.info(
+        msg="Pagina de veiculos pesados: caminhões!"
+    )
     return templates.TemplateResponse("index.html", {"request": request, "carros": caminhao})
 
 
