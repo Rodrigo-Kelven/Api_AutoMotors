@@ -5,7 +5,7 @@ Este projeto é uma API RESTful para um sistema de uma concéssionária. Um simp
 Ele permite que os usuários realizem operações como criar, ler, atualizar e excluir produtos, além de gerenciar pedidos e usuários.
 
 # Versão
-- 0.0.15
+- 0.0.20
 
 ## Tecnologias Utilizadas
 - [Python](https://www.python.org/) - Linguagem de programação
