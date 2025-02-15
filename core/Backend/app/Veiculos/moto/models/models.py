@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from datetime import datetime
 
 
-# Modelo para a coleção de carros no MongoDB
+# Modelo para a coleção de motos no MongoDB
 class Motos(BaseModel):
     marca: str
     modelo: str

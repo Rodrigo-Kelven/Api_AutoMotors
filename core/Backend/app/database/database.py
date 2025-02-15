@@ -10,7 +10,7 @@ import os
 
 # Conexão com o MongoDB
 client = AsyncIOMotorClient("mongodb://localhost:27017")  # Substitua com sua URL do MongoDB
-db = client.veiculos  # O banco de dados para veículos em MongoDB
+db = client["veiculos"]  # O banco de dados para veículos em MongoDB
 
 # Conexão com o Redis
 redis_client_users = redis.Redis(host='localhost', port=6379, db=1)  # Conectando ao banco de dados 0
