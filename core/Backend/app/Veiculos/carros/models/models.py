@@ -7,6 +7,7 @@ from typing import Optional
 class Carro(BaseModel):
     marca: str
     modelo: str
+    categoria: str = "Carro"
     ano: int
     preco: float
     disponivel: bool

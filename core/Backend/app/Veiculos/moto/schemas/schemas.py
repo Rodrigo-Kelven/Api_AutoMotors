@@ -7,6 +7,7 @@ class MotosInfo(BaseModel):
     id: str
     marca: str
     modelo: str
+    categoria: str
     ano: int
     preco: float
     tipo: str
@@ -36,6 +37,7 @@ class MotosInfo(BaseModel):
 class MotosInfoResponse(BaseModel):
     marca: str
     modelo: str
+    categoria: str
     ano: int
     preco: float
     tipo: str

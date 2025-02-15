@@ -142,7 +142,7 @@ async def get_carros(
         "preco", "tipo", "cor",
         "quilometragem", "portas",
         "lugares", "combustivel",
-        "descricao", "endereco"
+        "descricao", "endereco", "categoria"
     ]
     
     if first_params not in campos_validos:

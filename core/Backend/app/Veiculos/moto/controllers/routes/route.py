@@ -131,7 +131,7 @@ async def get_motos(
         "preco", "tipo", "cor",
         "quilometragem", "lugares",
         "combustivel", "descricao",
-        "endereco"
+        "endereco", "categoria"
     ]
     
     if first_params not in campos_validos:

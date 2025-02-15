@@ -9,6 +9,7 @@ class CaminhaoInfo(BaseModel):
     id: str
     marca: str
     modelo: str
+    categoria: str
     ano: int
     preco: float
     disponivel: bool
@@ -21,6 +22,7 @@ class CaminhaoInfo(BaseModel):
     combustivel: str 
     descricao: str
     endereco: str
+
     imagem: str
     data_criacao: datetime
 
@@ -40,6 +42,7 @@ class CaminhaoInfo(BaseModel):
 class CaminhaoInfoResponse(BaseModel):
     marca: str
     modelo: str
+    categoria: str
     ano: int
     preco: float
     tipo: str

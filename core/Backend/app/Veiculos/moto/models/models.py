@@ -6,6 +6,7 @@ from datetime import datetime
 class Motos(BaseModel):
     marca: str
     modelo: str
+    categoria: str = "Moto"
     ano: int
     preco: float
     tipo: str

@@ -5,9 +5,10 @@ from datetime import datetime
 
 
 class CarroInfo(BaseModel):
-    id: str  # Aqui vamos usar o campo `id` como string
+    id: str  
     marca: str
     modelo: str
+    categoria: str
     ano: int
     preco: float
     tipo: str
@@ -37,6 +38,7 @@ class CarroInfo(BaseModel):
 class CarroInfoResponse(BaseModel):
     marca: str
     modelo: str
+    categoria: str
     ano: int
     preco: float
     tipo: str
