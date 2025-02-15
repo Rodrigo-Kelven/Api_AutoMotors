@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 class CarroInfo(BaseModel):
-    id: Optional[str]  # Aqui vamos usar o campo `id` como string
+    id: str  # Aqui vamos usar o campo `id` como string
     marca: str
     modelo: str
     ano: int
@@ -31,6 +31,36 @@ class CarroInfo(BaseModel):
         # Converte o _id do MongoDB (ObjectId) para string
         document["id"] = str(document["_id"])
         return cls(**document)
+
+
+# somente para respostas sem _id/id
+class CarroInfoResponse(BaseModel):
+    marca: str
+    modelo: str
+    ano: int
+    preco: float
+    tipo: str
+    disponivel: bool
+    quilometragem: float
+    cor: str
+    portas: int
+    lugares: int
+    combustivel: str
+    descricao: str
+    endereco: str
+    imagem: str
+    data_criacao: datetime
+
+    class Config:
+        orm_mode = True
+        arbitrary_types_allowed = True  # Permite tipos como ObjectId
+
+    @classmethod
+    def from_mongo(cls, document) -> "CarroInfoResponse":
+        # Converte o _id do MongoDB (ObjectId) para string
+        document["id"] = str(document["_id"])
+        return cls(**document)
+
 
 
 class Veiculo(BaseModel):
