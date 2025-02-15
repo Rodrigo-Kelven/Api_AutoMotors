@@ -79,7 +79,7 @@ async def create_carro(
 
     # logs
     logger.info(
-        msg=f"Carro inserido: {carro_db["_id"]}"
+        msg=f"Carro inserido! "
     )
 
     # Converte para o modelo CarroInfo, incluindo o id
@@ -208,7 +208,7 @@ async def get_carros(carro_id: str):
     
     # logs
     logger.info(
-        msg=f"Informações do carro: {carro["_id"]}"
+        msg=f"Informações do carro"
     )
 
     # Retorna o carro no formato adequado, com o id convertido
@@ -309,7 +309,7 @@ async def update_carro(
 
     # logs
     logger.info(
-        msg=f"Carro atualizado: {updated_carro["_id"]}"
+        msg=f"Carro atualizado!"
     )
     
     # Retorna o carro atualizado como CarroInfo
@@ -351,7 +351,7 @@ async def delete_carro(
 
     # logs
     logger.info(
-        msg=f"Carro deletado: {carro["_id"]}"
+        msg=f"Carro deletado!"
     )
 
     return {"detail": "Carro excluído com sucesso"}

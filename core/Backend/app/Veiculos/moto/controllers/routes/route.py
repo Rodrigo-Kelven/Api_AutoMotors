@@ -195,7 +195,7 @@ async def list_veiculos(moto_id: str):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Moto não encontrada")
     
     logger.info(
-        msg=f"Informações da moto: {moto["_id"]}"
+        msg=f"Informações da moto!"
     )
     
     # Retorna a moto no formato adequado, com o id convertido
@@ -295,7 +295,7 @@ async def update_veiculo(
     updated_moto = await db.motos.find_one({"_id": moto_object_id})
 
     logger.info(
-        msg=f"Moto atualizada: {moto["_id"]}"
+        msg=f"Moto atualizada!"
     )
     
     # Retorna a moto atualizado como MotoInfo
@@ -336,6 +336,6 @@ async def delete_carro(
     await db.motos.delete_one({"_id": moto_object_id})
 
     logger.info(
-        msg=f"Moto excluída com sucesso! {moto["_id"]}"
+        msg=f"Moto excluída com sucesso!"
     )
     raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="Moto excluida com sucesso!")

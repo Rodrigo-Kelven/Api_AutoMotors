@@ -202,7 +202,7 @@ async def get_carros(caminhao_id: str):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Caminhao não encontrado!")
     
     logger.info(
-        msg=f"Informações da caminhao: {caminhao["_id"]}"
+        msg=f"Informações da caminhao!"
     )
     # Retorna o caminhao no formato adequado, com o id convertido
     return CaminhaoInfo.from_mongo(caminhao)
@@ -304,7 +304,7 @@ async def update_caminhao(
     updated_caminhao = await db.caminhao.find_one({"_id": caminhao_object_id})
     
     logger.info(
-        msg=f"Caminhao atualizado: {updated_caminhao["_id"]}"
+        msg=f"Caminhao atualizado!"
     )
 
     # Retorna o caminhao atualizado como CaminhaoInfo
@@ -346,6 +346,6 @@ async def delete_carro(
     await db.caminhao.delete_one({"_id": carro_object_id})
 
     logger.info(
-        msg=f"Caminhao excluído com sucesso!: {caminhao["_id"]}"
+        msg=f"Caminhao excluído com sucesso!"
     )
     raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="Caminhao excluido com sucesso!")
