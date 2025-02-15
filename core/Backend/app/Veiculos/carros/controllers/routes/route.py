@@ -121,7 +121,7 @@ def convert_search_value(value: str, campo: str):
             return float(value) if "." in value else int(value)
         return value  # Para outros campos, mantemos como string
     except ValueError:
-        raise HTTPException(status_code=400, detail=f"Valor para '{campo}' é inválido.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Valor para '{campo}' é inválido.")
 
 
 # Rota para buscar carros com parâmetros dinâmicos

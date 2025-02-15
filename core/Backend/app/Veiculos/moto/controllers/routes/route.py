@@ -1,5 +1,5 @@
-from fastapi import APIRouter, UploadFile, File, Form, status, HTTPException, Request, Depends
-from core.Backend.app.Veiculos.moto.schemas.schemas import MotosInfo
+from fastapi import APIRouter, UploadFile, File, Form, status, HTTPException, Request, Depends, Path
+from core.Backend.app.Veiculos.moto.schemas.schemas import MotosInfo, MotosInfoResponse
 from core.Backend.app.Veiculos.moto.models.models import Motos
 from core.Backend.auth.auth import get_current_user
 from core.Backend.app.config.config import logger
@@ -7,6 +7,7 @@ from core.Backend.app.database.database import db
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from bson import ObjectId
+from typing import List, Union
 import os
 
 
@@ -75,7 +76,7 @@ async def create_moto(
 
 
 @route_motos.get(
-    path="/veiculos-ultra-leves",
+    path="/veiculos-ultra-leves/",
     status_code=status.HTTP_200_OK,
     response_model=list[MotosInfo],
     response_description="Informaçoes da moto",
@@ -97,6 +98,75 @@ async def list_veiculos():
             msg="Nenhuma moto inserida!"
             )
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nenhuma moto inserido!")
+
+
+
+
+# Função para converter second_search para o tipo adequado
+def convert_search_value(value: str, campo: str):
+    try:
+        # Tentando converter conforme o tipo do campo
+        if campo in ["ano", "preco", "quilometragem", "portas", "lugares"]:
+            return float(value) if "." in value else int(value)
+        return value  # Para outros campos, mantemos como string
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Valor para '{campo}' é inválido.")
+
+
+# Rota para buscar carros com parâmetros dinâmicos
+@route_motos.get(
+        path="/veiculos-ultra-leves/{first_params}/{second_params}",
+        response_model=List[MotosInfoResponse],
+        #response_class=HTMLResponse,
+        )
+async def get_motos(
+    #request: Request,
+    first_params: str = Path(..., max_length=13, description="Campo a ser consultado no MongoDB" ,example="ano"),
+    second_params: Union[str, int, float] = Path(..., description="Valor para filtrar o campo", example="2005"),
+
+):
+    # Validar se o campo é permitido
+    campos_validos = [
+        "marca", "modelo", "ano",
+        "preco", "tipo", "cor",
+        "quilometragem", "lugares",
+        "combustivel", "descricao",
+        "endereco"
+    ]
+    
+    if first_params not in campos_validos:
+        logger.error(
+            msg=f"Campo '{first_params}' não é válido para consulta em {first_params}."
+        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Campo '{first_params}' não é válido para consulta.")
+    
+    # Converter o segundo parâmetro para o tipo correto antes da consulta
+    converted_value = convert_search_value(second_params, first_params)
+    
+    # Consulta para pegar os itens com o campo first_query igual a second_search
+    motos_cursor = db.motos.find({first_params: converted_value})
+    
+    # Usando to_list para pegar os resultados e modificar o _id
+    motos = []
+    logger.info(
+        msg="Parametros armazenados na lista para retorno"
+    )
+    async for moto in motos_cursor:
+        del moto['_id']  # Remover o campo _id
+        motos.append(moto)
+    
+    # Se não encontrou nenhum carro, retornar um erro
+    if not motos:
+        logger.info(
+            msg="Nenhuma moto encontrada com os parâmetros fornecidos."
+        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nenhuma moto encontrada com os parâmetros fornecidos.")
+    
+    return motos  # Retornando a lista de carros
+    # aqui conseque renderizar no frontend
+    #return templates.TemplateResponse("index.html", {"request": request, "motos": motos})
+
+
 
 
 

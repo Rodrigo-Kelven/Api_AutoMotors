@@ -1,5 +1,5 @@
-from fastapi import APIRouter, UploadFile, File, Form, status, HTTPException, Request, Depends
-from core.Backend.app.Veiculos.caminhao.schemas.schemas import CaminhaoInfo
+from fastapi import APIRouter, UploadFile, File, Form, status, HTTPException, Request, Depends, Path
+from core.Backend.app.Veiculos.caminhao.schemas.schemas import CaminhaoInfo, CaminhaoInfoResponse
 from core.Backend.app.Veiculos.caminhao.models.models import Caminhao
 from core.Backend.auth.auth import get_current_user
 from core.Backend.app.config.config import logger
@@ -7,6 +7,7 @@ from core.Backend.app.database.database import db
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from bson import ObjectId
+from typing import List, Union
 import os
 
 
@@ -105,6 +106,73 @@ async def get_caminhao():
             msg="Nenhum caminhao inserido!"
             )
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nenhum caminhao inserido!")
+
+
+
+# Função para converter second_search para o tipo adequado
+def convert_search_value(value: str, campo: str):
+    try:
+        # Tentando converter conforme o tipo do campo
+        if campo in ["ano", "preco", "quilometragem", "portas", "lugares"]:
+            return float(value) if "." in value else int(value)
+        return value  # Para outros campos, mantemos como string
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Valor para '{campo}' é inválido.")
+
+
+# Rota para buscar carros com parâmetros dinâmicos
+@router_caminhoes.get(
+        path="/veiculos-pesados/{first_params}/{second_params}",
+        response_model=List[CaminhaoInfoResponse],
+        #response_class=HTMLResponse,
+        )
+async def get_carros(
+    #request: Request,
+    first_params: str = Path(..., max_length=13, description="Campo a ser consultado no MongoDB" ,example="ano"),
+    second_params: Union[str, int, float] = Path(..., description="Valor para filtrar o campo", example="2005"),
+
+):
+    # Validar se o campo é permitido
+    campos_validos = [
+        "marca", "modelo", "ano",
+        "preco", "tipo", "cor",
+        "quilometragem", "portas",
+        "lugares", "combustivel",
+        "descricao", "endereco"
+    ]
+    
+    if first_params not in campos_validos:
+        logger.error(
+            msg=f"Campo '{first_params}' não é válido para consulta em {first_params}."
+        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Campo '{first_params}' não é válido para consulta.")
+    
+    # Converter o segundo parâmetro para o tipo correto antes da consulta
+    converted_value = convert_search_value(second_params, first_params)
+    
+    # Consulta para pegar os itens com o campo first_query igual a second_search
+    caminhao_cursor = db.caminhao.find({first_params: converted_value})
+    
+    # Usando to_list para pegar os resultados e modificar o _id
+    caminhoes = []
+    logger.info(
+        msg="Parametros armazenados na lista para retorno"
+    )
+    async for caminhao in caminhao_cursor:
+        del caminhao['_id']  # Remover o campo _id
+        caminhoes.append(caminhao)
+    
+    # Se não encontrou nenhum carro, retornar um erro
+    if not caminhoes:
+        logger.info(
+            msg="Nenhum caminhão encontrado com os parâmetros fornecidos."
+        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nenhum caminhão encontrado com os parâmetros fornecidos.")
+    
+    return caminhoes  # Retornando a lista de carros
+    # aqui conseque renderizar no frontend
+    #return templates.TemplateResponse("index.html", {"request": request, "caminhoes": caminhoes})
+
 
 
 
