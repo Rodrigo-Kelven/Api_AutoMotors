@@ -101,7 +101,7 @@ async def rate_limit_middleware(request: Request, call_next):
 """
 
 
-# atualizar e confighurar
+
 def cors(app):
     from fastapi.middleware.cors import CORSMiddleware
 
