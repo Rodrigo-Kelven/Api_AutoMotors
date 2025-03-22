@@ -120,7 +120,15 @@ def cors(app):
     allow_headers=["Content-Type", "Authorization"],
     expose_headers=["X-Custom-Header"],
     max_age=3600,
+<<<<<<< HEAD
     )
+=======
+<<<<<<< HEAD
+)
+=======
+    )
+>>>>>>> e9d554e (correction in CORS and version of api)
+>>>>>>> f5b0788 (correction in CORS and version of api)
 
 
 # Configurar o registro
