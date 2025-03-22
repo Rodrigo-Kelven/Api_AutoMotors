@@ -18,4 +18,4 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # O frontend (rodando no browser do usuário) manda o username e a senha para uma URL específica na sua API (declarada com tokenUrl="token").
 # Esse parâmetro contém a URL que o client (o frontend rodando no browser do usuário) vai usar para mandar o username e senha para obter um token
 # se mudar a rota de login, nao esqueca de mudar aqui, porque o fastapi simplesmente nao AVISA PORRA
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api-veiculos/auten_auth/login") 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api-v2/veiculos/auten_auth/login") 

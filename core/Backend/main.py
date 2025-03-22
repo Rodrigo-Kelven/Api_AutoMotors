@@ -7,6 +7,7 @@ from core.Backend.app.Veiculos.all_routes import all_routes
 
 # chama o arquivo de configuraçao
 app = FastAPI()
+
 # Monta o diretório de uploads para servir imagens
 # esta parte é crucial, se não for montado aqui, as imagens nao irão renderizar
 # pois o fastapi vai entender que o diretorio não foi montado

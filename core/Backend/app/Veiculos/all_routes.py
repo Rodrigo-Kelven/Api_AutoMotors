@@ -5,21 +5,27 @@ from core.Backend.app.Veiculos.caminhao.controllers.routes.route import router_c
 from core.Backend.app.Veiculos.moto.controllers.routes.route import route_motos
 from core.Backend.auth.routes.routes import routes_auth_auten
 
+# tags 
 class Tags(Enum):
     carros = "Veiculos Leves"
     caminhoes = "Veiculos Pesados"
     motos = "Veiculos Ultra Leves"
     auth_auten = "Autenticação e Autorização"
 
+# prefixp da api
+class Prefix(Enum):
+    api = "/api-v2/veiculos/categoria"
+    api_auth = "/api-v2/veiculos/auten_auth"
+
 
 
 app = APIRouter()
 
 def all_routes(app):
-    app.include_router(router_carros, tags=[Tags.carros], prefix="/api-veiculos/categoria")
-    app.include_router(router_caminhoes, tags=[Tags.caminhoes], prefix="/api-veiculos/categoria")
-    app.include_router(route_motos, tags=[Tags.motos], prefix="/api-veiculos/categoria")
-    app.include_router(routes_auth_auten, tags=[Tags.auth_auten], prefix="/api-veiculos/auten_auth")
+    app.include_router(router_carros, tags=[Tags.carros], prefix=Prefix.api.value)
+    app.include_router(router_caminhoes, tags=[Tags.caminhoes], prefix=Prefix.api.value)
+    app.include_router(route_motos, tags=[Tags.motos], prefix=Prefix.api.value)
+    app.include_router(routes_auth_auten, tags=[Tags.auth_auten], prefix=Prefix.api_auth.value)
 
 
 """
