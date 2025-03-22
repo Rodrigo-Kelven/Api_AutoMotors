@@ -15,7 +15,7 @@ class Tags(Enum):
 # prefixp da api
 class Prefix(Enum):
     api = "/api-v2/veiculos/categoria"
-    api_auth = "/api-v2/veiculos/auten_auth"
+    api_auth = "/api-v2/veiculos/auth"
 
 
 
