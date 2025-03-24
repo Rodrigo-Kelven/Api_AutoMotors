@@ -1,9 +1,9 @@
 from fastapi import APIRouter, UploadFile, File, Form, status, Request, Depends, Path
 from core.Backend.app.Veiculos.caminhao.schemas.schemas import CaminhaoInfo, CaminhaoInfoResponse
+from core.Backend.app.services.services_caminhao import ServiceCaminhao
 from core.Backend.auth.auth import get_current_user
 from fastapi.responses import HTMLResponse
 from typing import List, Union
-from core.Backend.app.services.services_caminhao import ServiceCaminhao
 
 
 router_caminhoes = APIRouter()

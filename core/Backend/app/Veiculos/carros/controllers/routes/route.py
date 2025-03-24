@@ -2,17 +2,8 @@ from fastapi import APIRouter, Path, UploadFile, File, Form, status, Request, De
 from core.Backend.app.Veiculos.carros.schemas.schema import CarroInfo, CarroInfoResponse
 from core.Backend.app.services.services_carro import ServiceCarros
 from core.Backend.auth.auth import get_current_user
-from core.Backend.app.config.config import logger
-from core.Backend.app.database.database import db
-from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from typing import List, Union
-
-
-
-# Configura o diretório de templates
-templates = Jinja2Templates(directory="templates")
-
 
 
 router_carros = APIRouter()
@@ -106,13 +97,7 @@ async def get_carros(carro_id: str):
     response_class=HTMLResponse
 )
 async def read_root(request: Request):
-    carros_cursor = db.carros.find()
-    carros = [CarroInfo.from_mongo(carro) for carro in await carros_cursor.to_list(length=100)]
-
-    logger.info(
-        msg="Pagina de veiculos leves: carros!"
-    )
-    return templates.TemplateResponse("index.html", {"request": request, "carros": carros})
+    return await ServiceCarros.render_HTML(request)
 
 
 # Rota PUT para atualizar um carro

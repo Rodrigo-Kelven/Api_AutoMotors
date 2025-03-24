@@ -1,11 +1,11 @@
-import os
 from core.Backend.app.Veiculos.caminhao.models.models import Caminhao
 from core.Backend.app.Veiculos.caminhao.schemas.schemas import CaminhaoInfo
 from core.Backend.app.database.database import db
 from core.Backend.app.config.config import logger
+from fastapi.templating import Jinja2Templates
 from fastapi import HTTPException, status
 from bson import ObjectId
-from fastapi.templating import Jinja2Templates
+import os
 
 
 # Configura o diretório de templates
@@ -16,7 +16,9 @@ UPLOAD_DIRECTORY = "uploads"
 os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
 
+#servico somente para caminhao
 class ServiceCaminhao:
+
 
     @staticmethod
     async def create_caminhao(

@@ -2,10 +2,14 @@ from core.Backend.app.Veiculos.carros.schemas.schema import CarroInfo
 from core.Backend.app.Veiculos.carros.models.models import Carro
 from core.Backend.app.database.database import db
 from core.Backend.app.config.config import logger
+from fastapi.templating import Jinja2Templates
 from fastapi import HTTPException, status
 from bson import ObjectId
 import os
 
+
+# Configura o diretório de templates
+templates = Jinja2Templates(directory="templates")
 
 # Verifica se a pasta existe
 UPLOAD_DIRECTORY = "uploads"
@@ -162,6 +166,18 @@ class ServiceCarros:
 
         # Retorna o carro no formato adequado, com o id convertido
         return CarroInfo.from_mongo(carro)
+    
+
+    @staticmethod
+    async def render_HTML(request):
+        carros_cursor = db.carros.find()
+        carros = [CarroInfo.from_mongo(carro) for carro in await carros_cursor.to_list(length=100)]
+
+        logger.info(
+            msg="Pagina de veiculos leves: carros!"
+        )
+        return templates.TemplateResponse("index.html", {"request": request, "carros": carros})
+
 
     
     @staticmethod

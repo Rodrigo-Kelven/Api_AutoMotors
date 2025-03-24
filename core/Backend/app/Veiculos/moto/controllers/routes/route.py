@@ -1,9 +1,9 @@
 from fastapi import APIRouter, UploadFile, File, Form, status, Request, Depends, Path
 from core.Backend.app.Veiculos.moto.schemas.schemas import MotosInfo, MotosInfoResponse
+from core.Backend.app.services.services_moto import ServicesMoto
 from core.Backend.auth.auth import get_current_user
 from fastapi.responses import HTMLResponse
 from typing import List, Union
-from core.Backend.app.services.services_moto import ServicesMoto
 
 
 route_motos = APIRouter()

@@ -1,11 +1,12 @@
-import os
+from core.Backend.app.config.config import logger
 from core.Backend.app.Veiculos.moto.models.models import Motos
 from core.Backend.app.Veiculos.moto.schemas.schemas import MotosInfo
 from core.Backend.app.database.database import db
-from fastapi import HTTPException, status
-from core.Backend.app.config.config import logger
-from bson import ObjectId
 from fastapi.templating import Jinja2Templates
+from fastapi import HTTPException, status
+from bson import ObjectId
+import os
+
 
 # Configura o diretório de templates
 templates = Jinja2Templates(directory="templates")
@@ -15,6 +16,7 @@ UPLOAD_DIRECTORY = "uploads"
 os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
 
+# servico somente para motos
 class ServicesMoto:
 
 
