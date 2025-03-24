@@ -39,6 +39,7 @@ async def create_caminhao(
     Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo"),
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
 ):
+    # servico de registro de caminhao
     return await ServiceCaminhao.create_caminhao(
         Marca, Modelo, Ano, Preco, Disponivel, Tipo,
         Cap_Maxima, Quilometragem, Cor, Portas, Lugares,
@@ -56,18 +57,8 @@ async def create_caminhao(
         name="Pegar informacoes do Caminhao"
 )
 async def get_caminhao():
-
+    # servico para retornar todos os caminhos do banco de dados
     return await ServiceCaminhao.get_all_caminhoes()
-
-# Função para converter second_search para o tipo adequado
-# def convert_search_value(value: str, campo: str):
-#     try:
-#         # Tentando converter conforme o tipo do campo
-#         if campo in ["ano", "preco", "quilometragem", "portas", "lugares"]:
-#             return float(value) if "." in value else int(value)
-#         return value  # Para outros campos, mantemos como string
-#     except ValueError:
-#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Valor para '{campo}' é inválido.")
 
 
 # Rota para buscar carros com parâmetros dinâmicos
@@ -82,6 +73,7 @@ async def get_carros(
     second_params: Union[str, int, float] = Path(..., description="Valor para filtrar o campo", example="2005"),
 
 ):
+    # servico retorna dados compativel com os parametros
     return await ServiceCaminhao.get_caminhao_with_params(first_params ,second_params)
 
 
@@ -94,7 +86,7 @@ async def get_carros(
     name="Pegar informações do Caminhao"
 )
 async def get_carros(caminhao_id: str):
-    
+    # servico para retornar dados com base o ID do caminhao
     return await ServiceCaminhao.get_caminhao_ID(caminhao_id)
 
 
@@ -108,7 +100,7 @@ async def get_carros(caminhao_id: str):
         response_class=HTMLResponse
 )
 async def read_root(request: Request):
-    # renderiza as informacoes no HTML
+    # servico para renderiza as informacoes no HTML
     return await ServiceCaminhao.render_HTML(request)
 
 # Rota PUT para atualizar um caminhao
@@ -139,7 +131,7 @@ async def update_caminhao(
     Imagem: UploadFile = File(None, title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo"),
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
 ):
-
+    # servico para update somente com o ID do caminhao 
     return await ServiceCaminhao.update_caminhao(
         caminhao_id, Marca, Modelo, Ano, Preco, Disponivel, Tipo,
         Cap_Maxima, Quilometragem, Cor, Portas, Lugares,
@@ -160,5 +152,5 @@ async def delete_carro(
     caminhao_id: str,
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
     ):
-    
+    # servico para delete de caminhao somente com ID
     return await ServiceCaminhao.delete_car(caminhao_id)

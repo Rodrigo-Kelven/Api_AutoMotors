@@ -34,7 +34,7 @@ async def create_moto(
     Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo"),
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
 ):
-    # realiza registro da moto
+    # servico para registro da moto
     return await ServicesMoto.create_moto(
         Marca, Modelo, Ano, Preco, Tipo, Disponivel,
         Quilometragem, Cor, Lugares, Combustivel, Descricao,
@@ -51,7 +51,7 @@ async def create_moto(
     name="Pegar informações do Moto"
 )
 async def list_veiculos():
-    # realiza listagem de todos os veiculos
+    # servico de listagem de todos os veiculos leves 'motos'
     return await ServicesMoto.get_all_motos()
 
 
@@ -67,7 +67,7 @@ async def get_motos(
     second_params: Union[str, int, float] = Path(..., description="Valor para filtrar o campo", example="2005"),
 
 ):
-    # realiza get por parametros
+    # servico para dados somente por parametros
     return await ServicesMoto.get_with_params(first_params, second_params)
 
 
@@ -81,7 +81,7 @@ async def get_motos(
     name="Pegar informações da moto"
 )
 async def list_veiculos(moto_id: str):
-    # realiza get por ID
+    # servico para pegar moto por ID
     return await ServicesMoto.get_moto_ID(moto_id)
 
 
@@ -95,7 +95,7 @@ async def list_veiculos(moto_id: str):
         response_class=HTMLResponse
 )
 async def read_root(request: Request):
-    # renderiza dados no HTML
+    # servico para renderiza dados no HTML
     return await ServicesMoto.render_html(request)
 
 
@@ -126,7 +126,7 @@ async def update_veiculo(
     Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo"),
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
 ):
-    # realiza atualizacao da moto
+    # servico para update da moto
     return await ServicesMoto.update_moto(
         moto_id, Marca, Modelo, Ano, Preco, Tipo, Disponivel,
         Quilometragem, Cor, Lugares, Combustivel, Descricao,
@@ -145,5 +145,5 @@ async def delete_carro(
     moto_id: str,
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
     ):
-    # realiza o delete
+    # servico de delete
     return await ServicesMoto.delete_moto_ID(moto_id)
