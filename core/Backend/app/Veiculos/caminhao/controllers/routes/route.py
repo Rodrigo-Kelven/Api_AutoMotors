@@ -1,24 +1,16 @@
 from fastapi import APIRouter, UploadFile, File, Form, status, HTTPException, Request, Depends, Path
 from core.Backend.app.Veiculos.caminhao.schemas.schemas import CaminhaoInfo, CaminhaoInfoResponse
-from core.Backend.app.Veiculos.caminhao.models.models import Caminhao
 from core.Backend.auth.auth import get_current_user
 from core.Backend.app.config.config import logger
 from core.Backend.app.database.database import db
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from bson import ObjectId
 from typing import List, Union
-import os
-
 from core.Backend.app.services.services_caminhao import ServiceCaminhao
 
 
 # Configura o diretório de templates
 templates = Jinja2Templates(directory="templates")
-
-# verifica se a pasta existe
-UPLOAD_DIRECTORY = "uploads"
-os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
 
 router_caminhoes = APIRouter()
