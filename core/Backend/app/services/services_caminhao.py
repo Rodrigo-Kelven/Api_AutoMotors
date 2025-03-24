@@ -143,3 +143,93 @@ class ServiceCaminhao:
         )
         # Retorna o caminhao no formato adequado, com o id convertido
         return CaminhaoInfo.from_mongo(caminhao)
+    
+
+    @staticmethod
+    async def update_caminhao(
+        caminhao_id, Marca, Modelo, Ano, Preco, Disponivel, Tipo,
+        Cap_Maxima, Quilometragem, Cor, Portas, Lugares,
+        Combustivel, Descricao, Endereco, Imagem
+        ):
+        try:
+            # Tenta converter o caminhao_id para ObjectId, porque o MongoDB trabalha com objetos!
+            caminhao_object_id = ObjectId(caminhao_id)
+        except Exception as e:
+            logger.error(
+                msg="ID de caminhao inválido!"
+            )
+            raise HTTPException(status_code=400, detail="ID de caminhao inválido!")
+
+        # Busca o caminhao no banco de dados
+        caminhao = await db.caminhao.find_one({"_id": caminhao_object_id})
+
+        if not caminhao:
+            logger.info(
+                msg="Caminhao não encontrado!"
+            )
+            raise HTTPException(status_code=404, detail="Caminhao não encontrado!")
+
+        update_data = {
+            "marca": Marca,
+            "modelo": Modelo,
+            "ano": Ano,
+            "preco": Preco,
+            "disponivel": Disponivel,
+            "tipo": Tipo,
+            "cap_maxima": Cap_Maxima,
+            "quilometragem": Quilometragem,
+            "cor": Cor,
+            "portas": Portas,
+            "lugares": Lugares,
+            "combustivel": Combustivel,
+            "descricao": Descricao,
+            "endereco": Endereco,
+        }
+
+        if Imagem:
+            file_location = f"{UPLOAD_DIRECTORY}/{Imagem.filename}"
+            with open(file_location, "wb") as file_object:
+                file_object.write(await Imagem.read())
+            update_data["imagem"] = file_location
+
+        # Atualiza o caminhao no banco de dados
+        await db.caminhao.update_one({"_id": caminhao_object_id}, {"$set": update_data})
+        
+        # Recupera o caminhao atualizado
+        updated_caminhao = await db.caminhao.find_one({"_id": caminhao_object_id})
+        
+        logger.info(
+            msg=f"Caminhao atualizado!"
+        )
+
+        # Retorna o caminhao atualizado como CaminhaoInfo
+        return CaminhaoInfo.from_mongo(updated_caminhao)
+    
+
+    @staticmethod
+    async def delete_car(caminhao_id):
+        try:
+            # Tenta converter caminhao_id para ObjectId, porque o MongoDB trabalha com objetos!
+            carro_object_id = ObjectId(caminhao_id)
+        except Exception as e:
+            logger.error(
+                msg="Id caminhao invalido!"
+            )
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de caminhao inválido!")
+
+        # Busca o caminhao no banco de dados
+        caminhao = await db.caminhao.find_one({"_id": carro_object_id})
+
+        if not caminhao:
+            logger.info(
+                msg="Caminhao não encontrado!"
+            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Caminhao não encontrado!")
+
+        # Exclui o caminhao usando o ObjectId
+        await db.caminhao.delete_one({"_id": carro_object_id})
+
+        logger.info(
+            msg=f"Caminhao excluído com sucesso!"
+        )
+        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="Caminhao excluido com sucesso!")
