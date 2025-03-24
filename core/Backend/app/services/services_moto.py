@@ -5,15 +5,18 @@ from core.Backend.app.database.database import db
 from fastapi import HTTPException, status
 from core.Backend.app.config.config import logger
 from bson import ObjectId
+from fastapi.templating import Jinja2Templates
 
+# Configura o diretório de templates
+templates = Jinja2Templates(directory="templates")
 
 # verifica se a pasta existe
 UPLOAD_DIRECTORY = "uploads"
 os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
 
-
 class ServicesMoto:
+
 
     @staticmethod
     async def create_moto(
@@ -143,6 +146,17 @@ class ServicesMoto:
         # Retorna a moto no formato adequado, com o id convertido
         return MotosInfo.from_mongo(moto)
     
+
+    @staticmethod
+    async def render_html(request):
+        motos_cursor = db.motos.find()
+        motos = [MotosInfo.from_mongo(moto) for moto in await motos_cursor.to_list(length=100)]
+
+        logger.info(
+            msg="Pagina de veiculos ultra leves: motos!"
+        )
+        return templates.TemplateResponse("index.html", {"request": request, "carros": motos})
+        
 
     @staticmethod
     async def update_moto(

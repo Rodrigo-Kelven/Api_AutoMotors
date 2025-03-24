@@ -1,16 +1,9 @@
-from fastapi import APIRouter, UploadFile, File, Form, status, HTTPException, Request, Depends, Path
+from fastapi import APIRouter, UploadFile, File, Form, status, Request, Depends, Path
 from core.Backend.app.Veiculos.caminhao.schemas.schemas import CaminhaoInfo, CaminhaoInfoResponse
 from core.Backend.auth.auth import get_current_user
-from core.Backend.app.config.config import logger
-from core.Backend.app.database.database import db
-from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from typing import List, Union
 from core.Backend.app.services.services_caminhao import ServiceCaminhao
-
-
-# Configura o diretório de templates
-templates = Jinja2Templates(directory="templates")
 
 
 router_caminhoes = APIRouter()
@@ -115,14 +108,8 @@ async def get_carros(caminhao_id: str):
         response_class=HTMLResponse
 )
 async def read_root(request: Request):
-    caminhao_cursor = db.caminhao.find()
-    caminhao = [CaminhaoInfo.from_mongo(caminhao) for caminhao in await caminhao_cursor.to_list(length=100)]
-    
-    logger.info(
-        msg="Pagina de veiculos pesados: caminhões!"
-    )
-    return templates.TemplateResponse("index.html", {"request": request, "carros": caminhao})
-
+    # renderiza as informacoes no HTML
+    return await ServiceCaminhao.render_HTML(request)
 
 # Rota PUT para atualizar um caminhao
 @router_caminhoes.put(

@@ -5,6 +5,11 @@ from core.Backend.app.database.database import db
 from core.Backend.app.config.config import logger
 from fastapi import HTTPException, status
 from bson import ObjectId
+from fastapi.templating import Jinja2Templates
+
+
+# Configura o diretório de templates
+templates = Jinja2Templates(directory="templates")
 
 # verifica se a pasta existe
 UPLOAD_DIRECTORY = "uploads"
@@ -143,6 +148,17 @@ class ServiceCaminhao:
         )
         # Retorna o caminhao no formato adequado, com o id convertido
         return CaminhaoInfo.from_mongo(caminhao)
+    
+    @staticmethod
+    async def render_HTML(request):
+        caminhao_cursor = db.caminhao.find()
+        caminhao = [CaminhaoInfo.from_mongo(caminhao) for caminhao in await caminhao_cursor.to_list(length=100)]
+        
+        logger.info(
+            msg="Pagina de veiculos pesados: caminhões!"
+        )
+        return templates.TemplateResponse("index.html", {"request": request, "carros": caminhao})
+
     
 
     @staticmethod

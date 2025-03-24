@@ -1,24 +1,9 @@
-from fastapi import APIRouter, UploadFile, File, Form, status, HTTPException, Request, Depends, Path
+from fastapi import APIRouter, UploadFile, File, Form, status, Request, Depends, Path
 from core.Backend.app.Veiculos.moto.schemas.schemas import MotosInfo, MotosInfoResponse
-from core.Backend.app.Veiculos.moto.models.models import Motos
 from core.Backend.auth.auth import get_current_user
-from core.Backend.app.config.config import logger
-from core.Backend.app.database.database import db
-from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from bson import ObjectId
 from typing import List, Union
-import os
-
 from core.Backend.app.services.services_moto import ServicesMoto
-
-
-# Configura o diretório de templates
-templates = Jinja2Templates(directory="templates")
-
-# verifica se a pasta existe
-UPLOAD_DIRECTORY = "uploads"
-os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
 
 route_motos = APIRouter()
@@ -49,7 +34,7 @@ async def create_moto(
     Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo"),
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
 ):
-    
+    # realiza registro da moto
     return await ServicesMoto.create_moto(
         Marca, Modelo, Ano, Preco, Tipo, Disponivel,
         Quilometragem, Cor, Lugares, Combustivel, Descricao,
@@ -66,20 +51,8 @@ async def create_moto(
     name="Pegar informações do Moto"
 )
 async def list_veiculos():
-    
+    # realiza listagem de todos os veiculos
     return await ServicesMoto.get_all_motos()
-
-
-
-# Função para converter second_search para o tipo adequado
-def convert_search_value(value: str, campo: str):
-    try:
-        # Tentando converter conforme o tipo do campo
-        if campo in ["ano", "preco", "quilometragem", "portas", "lugares"]:
-            return float(value) if "." in value else int(value)
-        return value  # Para outros campos, mantemos como string
-    except ValueError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Valor para '{campo}' é inválido.")
 
 
 # Rota para buscar carros com parâmetros dinâmicos
@@ -94,6 +67,7 @@ async def get_motos(
     second_params: Union[str, int, float] = Path(..., description="Valor para filtrar o campo", example="2005"),
 
 ):
+    # realiza get por parametros
     return await ServicesMoto.get_with_params(first_params, second_params)
 
 
@@ -107,7 +81,7 @@ async def get_motos(
     name="Pegar informações da moto"
 )
 async def list_veiculos(moto_id: str):
-
+    # realiza get por ID
     return await ServicesMoto.get_moto_ID(moto_id)
 
 
@@ -121,14 +95,8 @@ async def list_veiculos(moto_id: str):
         response_class=HTMLResponse
 )
 async def read_root(request: Request):
-    motos_cursor = db.motos.find()
-    motos = [MotosInfo.from_mongo(moto) for moto in await motos_cursor.to_list(length=100)]
-
-    logger.info(
-        msg="Pagina de veiculos ultra leves: motos!"
-    )
-    return templates.TemplateResponse("index.html", {"request": request, "carros": motos})
-
+    # renderiza dados no HTML
+    return await ServicesMoto.render_html(request)
 
 
 
@@ -158,6 +126,7 @@ async def update_veiculo(
     Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo"),
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
 ):
+    # realiza atualizacao da moto
     return await ServicesMoto.update_moto(
         moto_id, Marca, Modelo, Ano, Preco, Tipo, Disponivel,
         Quilometragem, Cor, Lugares, Combustivel, Descricao,
@@ -176,5 +145,5 @@ async def delete_carro(
     moto_id: str,
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
     ):
-    
+    # realiza o delete
     return await ServicesMoto.delete_moto_ID(moto_id)
