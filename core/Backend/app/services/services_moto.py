@@ -218,7 +218,7 @@ class ServicesMoto:
         # Retorna a moto atualizado como MotoInfo
         return MotosInfo.from_mongo(updated_moto)
 
-    async def delete_moto_ID(moto_id):
+    async def delete_moto(moto_id):
         try:
             # Tenta converter o moto_id para ObjectId, porque o MongoDB trabalha com objetos!
             moto_object_id = ObjectId(moto_id)

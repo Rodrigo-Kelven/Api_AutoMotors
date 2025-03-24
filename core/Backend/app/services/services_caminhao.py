@@ -225,7 +225,7 @@ class ServiceCaminhao:
     
 
     @staticmethod
-    async def delete_car(caminhao_id):
+    async def delete_caminhao(caminhao_id):
         try:
             # Tenta converter caminhao_id para ObjectId, porque o MongoDB trabalha com objetos!
             carro_object_id = ObjectId(caminhao_id)

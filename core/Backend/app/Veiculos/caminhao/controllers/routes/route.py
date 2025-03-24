@@ -153,4 +153,4 @@ async def delete_carro(
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
     ):
     # servico para delete de caminhao somente com ID
-    return await ServiceCaminhao.delete_car(caminhao_id)
+    return await ServiceCaminhao.delete_caminhao(caminhao_id)

@@ -146,4 +146,4 @@ async def delete_carro(
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
     ):
     # servico de delete
-    return await ServicesMoto.delete_moto_ID(moto_id)
+    return await ServicesMoto.delete_moto(moto_id)
