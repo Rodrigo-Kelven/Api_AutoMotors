@@ -35,7 +35,7 @@ async def create_moto(
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
 ):
     # servico para registro da moto
-    return await ServicesMoto.create_moto(
+    return await ServicesMoto.createBikeService(
         Marca, Modelo, Ano, Preco, Tipo, Disponivel,
         Quilometragem, Cor, Lugares, Combustivel, Descricao,
         Endereco, Imagem
@@ -52,7 +52,7 @@ async def create_moto(
 )
 async def list_veiculos():
     # servico de listagem de todos os veiculos leves 'motos'
-    return await ServicesMoto.get_all_motos()
+    return await ServicesMoto.getBikesService()
 
 
 # Rota para buscar carros com parâmetros dinâmicos
@@ -68,7 +68,7 @@ async def get_motos(
 
 ):
     # servico para dados somente por parametros
-    return await ServicesMoto.get_with_params(first_params, second_params)
+    return await ServicesMoto.getBikesWithParamsService(first_params, second_params)
 
 
 
@@ -82,7 +82,7 @@ async def get_motos(
 )
 async def list_veiculos(moto_id: str):
     # servico para pegar moto por ID
-    return await ServicesMoto.get_moto_ID(moto_id)
+    return await ServicesMoto.getBikeByIdService(moto_id)
 
 
 # Rota GET para renderizar o template HTML
@@ -96,7 +96,7 @@ async def list_veiculos(moto_id: str):
 )
 async def read_root(request: Request):
     # servico para renderiza dados no HTML
-    return await ServicesMoto.render_html(request)
+    return await ServicesMoto.getBikePageService(request)
 
 
 
@@ -127,7 +127,7 @@ async def update_veiculo(
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
 ):
     # servico para update da moto
-    return await ServicesMoto.update_moto(
+    return await ServicesMoto.updateBikeService(
         moto_id, Marca, Modelo, Ano, Preco, Tipo, Disponivel,
         Quilometragem, Cor, Lugares, Combustivel, Descricao,
         Endereco, Imagem
@@ -146,4 +146,4 @@ async def delete_carro(
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
     ):
     # servico de delete
-    return await ServicesMoto.delete_moto(moto_id)
+    return await ServicesMoto.deleteBikeService(moto_id)

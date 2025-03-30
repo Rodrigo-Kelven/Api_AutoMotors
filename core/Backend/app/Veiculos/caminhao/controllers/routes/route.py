@@ -21,7 +21,7 @@ router_caminhoes = APIRouter()
 # dividir por categorias, schema, models, categoria pra cada um
 # rael, esses forms devem estar somente no front, os dados serao enviado em forma de forms diretamente para o db, junto com a imagem
 # entao esses forms dessa rota sairao, ou nao, sla, veremos ao desenrolar do projeto
-async def create_caminhao(
+async def createTruck(
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
     Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
@@ -56,7 +56,7 @@ async def create_caminhao(
         description="Route para pegar informacoes do caminhao",
         name="Pegar informacoes do Caminhao"
 )
-async def get_caminhao():
+async def getTrucks():
     # servico para retornar todos os caminhos do banco de dados
     return await ServiceCaminhao.getTrucksService()
 
@@ -67,7 +67,7 @@ async def get_caminhao():
         response_model=List[CaminhaoInfoResponse],
         #response_class=HTMLResponse,
         )
-async def get_carros(
+async def getTrucksWithParams(
     #request: Request,
     first_params: str = Path(..., max_length=13, description="Campo a ser consultado no MongoDB" ,example="ano"),
     second_params: Union[str, int, float] = Path(..., description="Valor para filtrar o campo", example="2005"),
@@ -85,7 +85,7 @@ async def get_carros(
     description="Route para pegar informações do caminhao",
     name="Pegar informações do Caminhao"
 )
-async def get_carros(caminhao_id: str):
+async def getTruckById(caminhao_id: str):
     # servico para retornar dados com base o ID do caminhao
     return await ServiceCaminhao.getTruckByIdService(caminhao_id)
 
@@ -99,7 +99,7 @@ async def get_carros(caminhao_id: str):
         name="Renderizacao da pagina",
         response_class=HTMLResponse
 )
-async def read_root(request: Request):
+async def truckPage(request: Request):
     # servico para renderiza as informacoes no HTML
     return await ServiceCaminhao.getTruckPageService(request)
 
@@ -112,7 +112,7 @@ async def read_root(request: Request):
     description="Route update informações do Caminhao",
     name ="Atualizar informações do Caminhao"
 )
-async def update_caminhao(
+async def updateTruck(
     caminhao_id: str,
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
@@ -148,7 +148,7 @@ async def update_caminhao(
     description="Route delete caminhao",
     name="Delete Carro"
 )
-async def delete_carro(
+async def deleteTruck(
     caminhao_id: str,
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
     ):

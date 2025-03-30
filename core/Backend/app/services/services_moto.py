@@ -21,7 +21,7 @@ class ServicesMoto:
 
 
     @staticmethod
-    async def create_moto(
+    async def createBikeService(
         Marca, Modelo, Ano, Preco, Tipo, Disponivel,
         Quilometragem, Cor, Lugares, Combustivel, Descricao,
         Endereco, Imagem
@@ -80,7 +80,7 @@ class ServicesMoto:
     
 
     @staticmethod
-    async def get_all_motos():
+    async def getBikesService():
         """
         Args:
             nenhum parametro é passado
@@ -128,7 +128,7 @@ class ServicesMoto:
         
 
     @staticmethod
-    async def get_with_params(first_params, second_params):
+    async def getBikesWithParamsService(first_params, second_params):
         """
         Args:
             recebe dois tipos de parametros para realizar consulta
@@ -183,7 +183,7 @@ class ServicesMoto:
 
 
     @staticmethod
-    async def get_moto_ID(moto_id):
+    async def getBikeByIdService(moto_id):
         """
         Args:
             moto_id sera passado como um objeto 'json', já que o id é um uuid
@@ -216,7 +216,7 @@ class ServicesMoto:
     
 
     @staticmethod
-    async def render_html(request):
+    async def getBikePageService(request):
         """
         Args:
             request é passao para relaizar a consulta no banco de dados e renderizar no front
@@ -235,7 +235,7 @@ class ServicesMoto:
         
 
     @staticmethod
-    async def update_moto(
+    async def updateBikeService(
         moto_id, Marca, Modelo, Ano, Preco, Tipo, Disponivel,
         Quilometragem, Cor, Lugares, Combustivel, Descricao,
         Endereco, Imagem
@@ -317,7 +317,7 @@ class ServicesMoto:
         # Retorna a moto atualizado como MotoInfo
         return MotosInfo.from_mongo(updated_moto)
 
-    async def delete_moto(moto_id):
+    async def deleteBikeService(moto_id):
         """
         Args:
             moto_id é passado para realilzar consulta no banco de dados
