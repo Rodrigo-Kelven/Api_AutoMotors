@@ -40,7 +40,7 @@ async def create_caminhao(
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
 ):
     # servico de registro de caminhao
-    return await ServiceCaminhao.create_caminhao(
+    return await ServiceCaminhao.createTruckservice(
         Marca, Modelo, Ano, Preco, Disponivel, Tipo,
         Cap_Maxima, Quilometragem, Cor, Portas, Lugares,
         Combustivel, Descricao, Endereco, Imagem
@@ -58,7 +58,7 @@ async def create_caminhao(
 )
 async def get_caminhao():
     # servico para retornar todos os caminhos do banco de dados
-    return await ServiceCaminhao.get_all_caminhoes()
+    return await ServiceCaminhao.getTrucksService()
 
 
 # Rota para buscar carros com parâmetros dinâmicos
@@ -74,7 +74,7 @@ async def get_carros(
 
 ):
     # servico retorna dados compativel com os parametros
-    return await ServiceCaminhao.get_caminhao_with_params(first_params ,second_params)
+    return await ServiceCaminhao.getTrucskWithParamsService(first_params ,second_params)
 
 
 @router_caminhoes.get(
@@ -87,7 +87,7 @@ async def get_carros(
 )
 async def get_carros(caminhao_id: str):
     # servico para retornar dados com base o ID do caminhao
-    return await ServiceCaminhao.get_caminhao_ID(caminhao_id)
+    return await ServiceCaminhao.getTruckByIdService(caminhao_id)
 
 
 # Rota GET para renderizar o template HTML
@@ -101,7 +101,7 @@ async def get_carros(caminhao_id: str):
 )
 async def read_root(request: Request):
     # servico para renderiza as informacoes no HTML
-    return await ServiceCaminhao.render_HTML(request)
+    return await ServiceCaminhao.getTruckPageService(request)
 
 # Rota PUT para atualizar um caminhao
 @router_caminhoes.put(
@@ -132,7 +132,7 @@ async def update_caminhao(
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
 ):
     # servico para update somente com o ID do caminhao 
-    return await ServiceCaminhao.update_caminhao(
+    return await ServiceCaminhao.updateTruckService(
         caminhao_id, Marca, Modelo, Ano, Preco, Disponivel, Tipo,
         Cap_Maxima, Quilometragem, Cor, Portas, Lugares,
         Combustivel, Descricao, Endereco, Imagem
@@ -153,4 +153,4 @@ async def delete_carro(
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
     ):
     # servico para delete de caminhao somente com ID
-    return await ServiceCaminhao.delete_caminhao(caminhao_id)
+    return await ServiceCaminhao.deleteTruckService(caminhao_id)

@@ -27,7 +27,7 @@ class ServiceCarros:
         Combustivel, Descricao, Endereco, Imagem
         ):
         """
-        Cria um novo carro com as informações fornecidas e armazena mongodb
+        Cria um novo veiculo com as informações fornecidas e armazena mongodb
 
         Args:
             Marca (str): A marca do carro.
@@ -46,7 +46,7 @@ class ServiceCarros:
             Imagem (UploadFile): O arquivo de imagem do carro.
 
         Returns:
-            CaminhaoInfo: Um objeto contendo as informações do carro criado.
+            Um objeto contendo as informações do carro criado.
 
         Raises:
             Exception: Para outros erros que possam ocorrer durante a criação do carro.

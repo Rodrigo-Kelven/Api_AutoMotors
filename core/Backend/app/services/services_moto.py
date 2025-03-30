@@ -26,6 +26,31 @@ class ServicesMoto:
         Quilometragem, Cor, Lugares, Combustivel, Descricao,
         Endereco, Imagem
     ):
+        """
+        Cria um novo veiculo com as informações fornecidas e armazena mongodb
+
+        Args:
+            Marca (str): A marca do veiculo.
+            Modelo (str): O modelo do veiculo.
+            Ano (int): O ano de fabricação do veiculo.
+            Preco (float): O preço do veiculo.
+            Disponivel (bool): Indica se o veiculo está disponível para venda.
+            Tipo (str): O tipo do veiculo.
+            Quilometragem (float): A quilometragem do veiculo.
+            Cor (str): A cor do veiculo.
+            Portas (int): O número de portas do veiculo.
+            Lugares (int): O número de lugares disponíveis no veiculo.
+            Combustivel (str): O tipo de combustível utilizado pelo veiculo.
+            Descricao (str): Uma descrição detalhada do veiculo.
+            Endereco (str): O endereço onde o veiculo está localizado.
+            Imagem (UploadFile): O arquivo de imagem do veiculo.
+
+        Returns:
+            Um objeto contendo as informações do veiculo criado.
+
+        Raises:
+            Exception: Para outros erros que possam ocorrer durante a criação do veiculo.
+        """
         file_location = f"{UPLOAD_DIRECTORY}/{Imagem.filename}"
         with open(file_location, "wb") as file_object:
             file_object.write(await Imagem.read())
@@ -113,14 +138,14 @@ class ServicesMoto:
             del moto['_id']  # Remover o campo _id
             motos.append(moto)
         
-        # Se não encontrou nenhum carro, retornar um erro
+        # Se não encontrou nenhum veiculo, retornar um erro
         if not motos:
             logger.info(
                 msg="Nenhuma moto encontrada com os parâmetros fornecidos."
             )
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nenhuma moto encontrada com os parâmetros fornecidos.")
         
-        return motos  # Retornando a lista de carros
+        return motos  # Retornando a lista de veiculo
         # aqui conseque renderizar no frontend
         #return templates.TemplateResponse("index.html", {"request": request, "motos": motos})
 

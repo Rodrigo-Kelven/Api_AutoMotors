@@ -21,21 +21,38 @@ class ServiceCaminhao:
 
 
     @staticmethod
-    async def create_caminhao(
+    async def createTruckservice(
         Marca, Modelo, Ano, Preco, Disponivel, Tipo,
         Cap_Maxima, Quilometragem, Cor, Portas, Lugares,
         Combustivel, Descricao, Endereco, Imagem
     ):
         """
+        atualiza as informacoes do veiculo
         Args:
-            sao passados parametros recebidos do front junto com o upload da imagem para armazenamento 
-        Returns:
-            um status code 201, created é retornado caso seja criado com sucesso
-
+            Marca (str): A marca do caminhao.
+            Modelo (str): O modelo do caminhao.
+            Ano (int): O ano de fabricação do caminhao.
+            Preco (float): O preço do caminhao.
+            Disponivel (bool): Indica se o caminhao está disponível para venda.
+            Tipo (str): O tipo do caminhao.
+            Cap_Maxima: capacidade maxima do veiculo
+            Quilometragem (float): A quilometragem do caminhao.
+            Cor (str): A cor do caminhao.
+            Portas (int): O número de portas do caminhao.
+            Lugares (int): O número de lugares disponíveis no caminhao.
+            Combustivel (str): O tipo de combustível utilizado pelo caminhao.
+            Descricao (str): Uma descrição detalhada do caminhao.
+            Endereco (str): O endereço onde o caminhao está localizado.
+            Imagem (UploadFile): O arquivo de imagem do caminhao.
+        
+        Return:
+            retorna as informacoes do veiculo ja atualizado
+        
         Raises:
-            ....
-        """
+            caso o id seja invalido: 400, bad request
+            caso o caminhao nao exista: 404, not found
 
+        """
         file_location = f"{UPLOAD_DIRECTORY}/{Imagem.filename}"
         with open(file_location, "wb") as file_object:
             file_object.write(await Imagem.read())
@@ -67,7 +84,7 @@ class ServiceCaminhao:
     
 
     @staticmethod
-    async def get_all_caminhoes():
+    async def getTrucksService():
         """
             Args:
                 nenhum parametro é passado
@@ -113,7 +130,7 @@ class ServiceCaminhao:
         
     
     @staticmethod
-    async def get_caminhao_with_params(first_params, second_params):
+    async def getTrucskWithParamsService(first_params, second_params):
         """
         Args:
             recebe dois tipos de parametros para realizar consulta
@@ -168,7 +185,7 @@ class ServiceCaminhao:
 
     
     @staticmethod
-    async def get_caminhao_ID(caminhao_id):
+    async def getTruckByIdService(caminhao_id):
         """
         Args:
             caminhao_id sera passado como um objeto 'json', já que o id é um uuid
@@ -199,7 +216,7 @@ class ServiceCaminhao:
         return CaminhaoInfo.from_mongo(caminhao)
     
     @staticmethod
-    async def render_HTML(request):
+    async def getTruckPageService(request):
         """
         Args:
             request é passao para relaizar a consulta no banco de dados e renderizar no front
@@ -219,7 +236,7 @@ class ServiceCaminhao:
     
 
     @staticmethod
-    async def update_caminhao(
+    async def updateTruckService(
         caminhao_id, Marca, Modelo, Ano, Preco, Disponivel, Tipo,
         Cap_Maxima, Quilometragem, Cor, Portas, Lugares,
         Combustivel, Descricao, Endereco, Imagem
@@ -307,7 +324,7 @@ class ServiceCaminhao:
     
 
     @staticmethod
-    async def delete_caminhao(caminhao_id):
+    async def deleteTruckService(caminhao_id):
         """
         Args:
             caminhao_id é passado para realilzar consulta no banco de dados
