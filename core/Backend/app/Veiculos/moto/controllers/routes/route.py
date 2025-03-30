@@ -18,7 +18,7 @@ route_motos = APIRouter()
         description="Route para criar registro de Moto",
         name="Criar registro para Moto"
 )
-async def create_moto(
+async def createBike(
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
     Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
@@ -50,7 +50,7 @@ async def create_moto(
     description="Route para pegar informações da moto",
     name="Pegar informações do Moto"
 )
-async def list_veiculos():
+async def getBikes():
     # servico de listagem de todos os veiculos leves 'motos'
     return await ServicesMoto.getBikesService()
 
@@ -61,7 +61,7 @@ async def list_veiculos():
         response_model=List[MotosInfoResponse],
         #response_class=HTMLResponse,
         )
-async def get_motos(
+async def getBikesWithParams(
     #request: Request,
     first_params: str = Path(..., max_length=13, description="Campo a ser consultado no MongoDB" ,example="ano"),
     second_params: Union[str, int, float] = Path(..., description="Valor para filtrar o campo", example="2005"),
@@ -80,7 +80,7 @@ async def get_motos(
     description="Route para pegar informações da moto",
     name="Pegar informações da moto"
 )
-async def list_veiculos(moto_id: str):
+async def getBikeById(moto_id: str):
     # servico para pegar moto por ID
     return await ServicesMoto.getBikeByIdService(moto_id)
 
@@ -94,7 +94,7 @@ async def list_veiculos(moto_id: str):
         name="Renderizar pagina",
         response_class=HTMLResponse
 )
-async def read_root(request: Request):
+async def bikePage(request: Request):
     # servico para renderiza dados no HTML
     return await ServicesMoto.getBikePageService(request)
 
@@ -109,7 +109,7 @@ async def read_root(request: Request):
     description="Route update information moto",
     name ="Atualizar infomações da moto"
 )
-async def update_veiculo(
+async def updateBike(
     moto_id: str,
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
@@ -141,7 +141,7 @@ async def update_veiculo(
     description="Route delete moto",
     name="Deletar Moto"
 )
-async def delete_carro(
+async def deleteBike(
     moto_id: str,
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
     ):
