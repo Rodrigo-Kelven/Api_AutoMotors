@@ -21,7 +21,7 @@ class ServiceCarros:
 
 
     @staticmethod
-    async def create_car(
+    async def createCarService(
         Marca, Modelo, Ano, Preco, Disponivel,
         Tipo, Quilometragem, Cor, Portas, Lugares,
         Combustivel, Descricao, Endereco, Imagem
@@ -64,7 +64,7 @@ class ServiceCarros:
 
 
     @staticmethod
-    async def get_all_cars():
+    async def getCarsService():
 
         carros_cursor = db.carros.find()
         carros = [CarroInfo.from_mongo(carro) for carro in await carros_cursor.to_list(length=100)]
@@ -95,7 +95,7 @@ class ServiceCarros:
         
     
     @staticmethod
-    async def get_car_with_parameters(first_params, second_params):
+    async def getCarWithParamsService(first_params, second_params):
         # Validar se o campo é permitido
         campos_validos = [
             "marca", "modelo", "ano",
@@ -139,7 +139,7 @@ class ServiceCarros:
 
     
     @staticmethod
-    async def get_car_ID(carro_id):
+    async def getCarByIdService(carro_id):
         try:
             # Tenta converter o carro_id para ObjectId, porque o MongoDB trabalha com objetos!
             carro_object_id = ObjectId(carro_id)
@@ -169,7 +169,7 @@ class ServiceCarros:
     
 
     @staticmethod
-    async def render_HTML(request):
+    async def getCarPageService(request):
         carros_cursor = db.carros.find()
         carros = [CarroInfo.from_mongo(carro) for carro in await carros_cursor.to_list(length=100)]
 
@@ -181,7 +181,7 @@ class ServiceCarros:
 
     
     @staticmethod
-    async def update_car(
+    async def updateCarByIdService(
         carro_id, Marca, Modelo, Ano, Preco, Disponivel,
         Tipo, Quilometragem, Cor, Portas, Lugares,
         Combustivel, Descricao, Endereco, Imagem
@@ -240,8 +240,9 @@ class ServiceCarros:
         # Retorna o carro atualizado como CarroInfo
         return CarroInfo.from_mongo(updated_carro)
     
+
     @staticmethod
-    async def delete_car(carro_id):
+    async def deleteCarByIdService(carro_id):
         try:
             # Tenta converter o carro_id para ObjectId, porque o MongoDB trabalha com objetos!
             carro_object_id = ObjectId(carro_id)

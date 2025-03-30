@@ -18,7 +18,7 @@ router_carros = APIRouter()
     description="Route para criar registro de carro",
     name="Criar registro para Carro"
 )
-async def create_carro(
+async def createCar(
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
     Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
@@ -36,7 +36,7 @@ async def create_carro(
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
 ):
     # servico para realizar todo o processo de forma mais clean code
-    return await ServiceCarros.create_car(
+    return await ServiceCarros.createCarService(
         Marca, Modelo, Ano, Preco, Disponivel,
         Tipo, Quilometragem, Cor, Portas, Lugares,
         Combustivel, Descricao, Endereco, Imagem
@@ -52,10 +52,10 @@ async def create_carro(
     description="Route para pegar informações do carro",
     name="Pegar informações do Carro"
 )
-async def get_carros():
+async def getCars():
 
     # servico para retonar todos os carros
-    return await ServiceCarros.get_all_cars()
+    return await ServiceCarros.getCarsService()
 
 
 
@@ -65,14 +65,14 @@ async def get_carros():
         response_model=List[CarroInfoResponse],
         #response_class=HTMLResponse,
         )
-async def get_carros(
+async def getCarsWithParams(
     #request: Request,
     first_params: str = Path(..., max_length=13, description="Campo que deseja requisitar" ,example="ano"),
     second_params: Union[str, int, float] = Path(..., description="Valor do campo para filtragem.", example="2005"),
 
 ):
     # servico para pegar informacoes com base em parametros
-    return await ServiceCarros.get_car_with_parameters(first_params, second_params)
+    return await ServiceCarros.getCarWithParamsService(first_params, second_params)
 
 @router_carros.get(
     path="/veiculos-leves/{carro_id}",
@@ -82,9 +82,9 @@ async def get_carros(
     description="Route para pegar informações do carro",
     name="Pegar informações do Carro"
 )
-async def get_carros(carro_id: str):
+async def getCarById(carro_id: str):
     # servico para pegar informacoes do carro
-    return await ServiceCarros.get_car_ID(carro_id)
+    return await ServiceCarros.getCarByIdService(carro_id)
 
 
 # Rota GET para renderizar o template HTML
@@ -96,8 +96,8 @@ async def get_carros(carro_id: str):
     name="Renderização da página",
     response_class=HTMLResponse
 )
-async def read_root(request: Request):
-    return await ServiceCarros.render_HTML(request)
+async def getCarPage(request: Request):
+    return await ServiceCarros.getCarPageService(request)
 
 
 # Rota PUT para atualizar um carro
@@ -109,7 +109,7 @@ async def read_root(request: Request):
     description="Route update informações do carro",
     name="Atualizar informações do Carro"
 )
-async def update_carro(
+async def updateCar(
     carro_id: str,
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
@@ -128,11 +128,12 @@ async def update_carro(
     current_user: str = Depends(get_current_user)
 ):
     # servico para update do carro
-    return await ServiceCarros.update_car(
+    return await ServiceCarros.updateCarByIdService(
         carro_id, Marca, Modelo, Ano, Preco, Disponivel,
         Tipo, Quilometragem, Cor, Portas, Lugares,
         Combustivel, Descricao, Endereco, Imagem
     )
+
 
 # Rota DELETE para excluir um carro
 @router_carros.delete(
@@ -142,10 +143,10 @@ async def update_carro(
     description="Route delete carro",
     name="Delete Carro"
 )
-async def delete_carro(
+async def deleteCarById(
     carro_id: str,
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
     ):
 
     # servico para deletar carro
-    return await ServiceCarros.delete_car(carro_id)
+    return await ServiceCarros.deleteCarByIdService(carro_id)

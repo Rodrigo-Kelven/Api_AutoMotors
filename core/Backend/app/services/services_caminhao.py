@@ -26,6 +26,14 @@ class ServiceCaminhao:
         Cap_Maxima, Quilometragem, Cor, Portas, Lugares,
         Combustivel, Descricao, Endereco, Imagem
     ):
+        """
+        Args:
+            sao passados parametros para 
+        Returns:
+
+        Raises:
+
+        """
 
         file_location = f"{UPLOAD_DIRECTORY}/{Imagem.filename}"
         with open(file_location, "wb") as file_object:
@@ -56,6 +64,7 @@ class ServiceCaminhao:
         # Converte para o modelo CaminhaoInfo, incluindo o id
         return CaminhaoInfo.from_mongo(caminhao_db)
     
+
     @staticmethod
     async def get_all_caminhoes():
         caminhao_cursor = db.caminhao.find()
