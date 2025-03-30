@@ -30,20 +30,20 @@ class ServicesMoto:
         Cria um novo veiculo com as informações fornecidas e armazena mongodb
 
         Args:
-            Marca (str): A marca do veiculo.
-            Modelo (str): O modelo do veiculo.
-            Ano (int): O ano de fabricação do veiculo.
-            Preco (float): O preço do veiculo.
-            Disponivel (bool): Indica se o veiculo está disponível para venda.
-            Tipo (str): O tipo do veiculo.
-            Quilometragem (float): A quilometragem do veiculo.
-            Cor (str): A cor do veiculo.
-            Portas (int): O número de portas do veiculo.
-            Lugares (int): O número de lugares disponíveis no veiculo.
-            Combustivel (str): O tipo de combustível utilizado pelo veiculo.
-            Descricao (str): Uma descrição detalhada do veiculo.
-            Endereco (str): O endereço onde o veiculo está localizado.
-            Imagem (UploadFile): O arquivo de imagem do veiculo.
+            Marca (str): A marca do caminhao.
+            Modelo (str): O modelo do caminhao.
+            Ano (int): O ano de fabricação do caminhao.
+            Preco (float): O preço do caminhao.
+            Disponivel (bool): Indica se o caminhao está disponível para venda.
+            Tipo (str): O tipo do caminhao.
+            Quilometragem (float): A quilometragem do caminhao.
+            Cor (str): A cor do caminhao.
+            Lugares (int): O número de lugares disponíveis no caminhao.
+            Combustivel (str): O tipo de combustível utilizado pelo caminhao.
+            Descricao (str): Uma descrição detalhada do caminhao.
+            Endereco (str): O endereço onde o caminhao está localizado.
+            Imagem (UploadFile): O arquivo de imagem do caminhao.
+
 
         Returns:
             Um objeto contendo as informações do veiculo criado.
@@ -78,8 +78,17 @@ class ServicesMoto:
         # Converte para o modelo MotoInfo, incluindo o id
         return MotosInfo.from_mongo(moto_db)
     
+
     @staticmethod
     async def get_all_motos():
+        """
+        Args:
+            nenhum parametro é passado
+        Returns:
+            uma lista de todos os veiculos listados na tabela no banco de dados
+        Raises:
+            caso nenhum veiculo seja encontrado: 404, not found
+        """
         motos_cursor = db.motos.find()
         motos = [MotosInfo.from_mongo(moto) for moto in await motos_cursor.to_list(length=100)]
 
@@ -95,9 +104,20 @@ class ServicesMoto:
                 )
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nenhuma moto inserido!")
         
+
     @staticmethod
     # Função para converter second_search para o tipo adequado
     def convert_search_value(value: str, campo: str):
+        """
+        Args:
+            value recebe um numero inteiro relacionado ao valor do campo
+            campo recebe o valor e verifica se é possivel consultar com o campo passado
+        Returns:
+            retorna a permissao para a realizacao da consulta
+        Raises:
+            Caso nao seja encontrado campo ou value, erro 400, bad request
+        """
+
         try:
             # Tentando converter conforme o tipo do campo
             if campo in ["ano", "preco", "quilometragem", "portas", "lugares"]:
@@ -106,8 +126,20 @@ class ServicesMoto:
         except ValueError:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Valor para '{campo}' é inválido.")
         
+
     @staticmethod
     async def get_with_params(first_params, second_params):
+        """
+        Args:
+            recebe dois tipos de parametros para realizar consulta
+            first_params: sendo string
+            second_params: sendo inteiro
+        Returns:
+            o resultado referente com os parametros de pesquisa 
+        Raises:
+            caso first_params nao esteja setado em campos_validos, retorna 400, bad request
+            caso nao possua carros: 404, not found
+        """
         # Validar se o campo é permitido
         campos_validos = [
             "marca", "modelo", "ano",
@@ -149,8 +181,17 @@ class ServicesMoto:
         # aqui conseque renderizar no frontend
         #return templates.TemplateResponse("index.html", {"request": request, "motos": motos})
 
+
     @staticmethod
     async def get_moto_ID(moto_id):
+        """
+        Args:
+            moto_id sera passado como um objeto 'json', já que o id é um uuid
+        Return:
+            caso o id esteja no banco de dados, o objeto mongo db é transformando para pydantic, e o valor retornado
+        Raises:
+            caso o carro nao exista: 404, not found
+        """
         try:
             # Tenta converter a moto_id para ObjectId, porque o MongoDB trabalha com objetos!
             moto_object_id = ObjectId(moto_id)
@@ -176,6 +217,14 @@ class ServicesMoto:
 
     @staticmethod
     async def render_html(request):
+        """
+        Args:
+            request é passao para relaizar a consulta no banco de dados e renderizar no front
+        Returns:
+            os dados retornados nao tratados e renderizados
+        Raises:
+            caso nenhum carro exista: 404, not found
+        """
         motos_cursor = db.motos.find()
         motos = [MotosInfo.from_mongo(moto) for moto in await motos_cursor.to_list(length=100)]
 
@@ -191,6 +240,31 @@ class ServicesMoto:
         Quilometragem, Cor, Lugares, Combustivel, Descricao,
         Endereco, Imagem
     ):
+        """
+        atualiza as informacoes do veiculo
+        Args:
+            Marca (str): A marca do caminhao.
+            Modelo (str): O modelo do caminhao.
+            Ano (int): O ano de fabricação do caminhao.
+            Preco (float): O preço do caminhao.
+            Disponivel (bool): Indica se o caminhao está disponível para venda.
+            Tipo (str): O tipo do caminhao.
+            Quilometragem (float): A quilometragem do caminhao.
+            Cor (str): A cor do caminhao.
+            Lugares (int): O número de lugares disponíveis no caminhao.
+            Combustivel (str): O tipo de combustível utilizado pelo caminhao.
+            Descricao (str): Uma descrição detalhada do caminhao.
+            Endereco (str): O endereço onde o caminhao está localizado.
+            Imagem (UploadFile): O arquivo de imagem do caminhao.
+        
+        Return:
+            retorna as informacoes do veiculo ja atualizado
+        
+        Raises:
+            caso o id seja invalido: 400, bad request
+            caso o caminhao nao exista: 404, not found
+
+        """
         try:
             # Tenta converter a moto_id para ObjectId, porque o MongoDB trabalha com objetos!
             moto_object_id = ObjectId(moto_id)
@@ -244,6 +318,15 @@ class ServicesMoto:
         return MotosInfo.from_mongo(updated_moto)
 
     async def delete_moto(moto_id):
+        """
+        Args:
+            moto_id é passado para realilzar consulta no banco de dados
+        Returns:
+            ao deletar veiculo, é retornado status code 204, not content
+        Raises:
+            caso o id seja invalido: 400, bad request
+            caso o carro nao exista: 404, not found
+        """
         try:
             # Tenta converter o moto_id para ObjectId, porque o MongoDB trabalha com objetos!
             moto_object_id = ObjectId(moto_id)

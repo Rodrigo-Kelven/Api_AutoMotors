@@ -215,6 +215,7 @@ class ServiceCaminhao:
         # Retorna o caminhao no formato adequado, com o id convertido
         return CaminhaoInfo.from_mongo(caminhao)
     
+
     @staticmethod
     async def getTruckPageService(request):
         """
@@ -234,7 +235,6 @@ class ServiceCaminhao:
         return templates.TemplateResponse("index.html", {"request": request, "carros": caminhao})
 
     
-
     @staticmethod
     async def updateTruckService(
         caminhao_id, Marca, Modelo, Ano, Preco, Disponivel, Tipo,
