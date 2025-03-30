@@ -28,11 +28,12 @@ class ServiceCaminhao:
     ):
         """
         Args:
-            sao passados parametros para 
+            sao passados parametros recebidos do front junto com o upload da imagem para armazenamento 
         Returns:
+            um status code 201, created é retornado caso seja criado com sucesso
 
         Raises:
-
+            ....
         """
 
         file_location = f"{UPLOAD_DIRECTORY}/{Imagem.filename}"
@@ -67,6 +68,14 @@ class ServiceCaminhao:
 
     @staticmethod
     async def get_all_caminhoes():
+        """
+            Args:
+                nenhum parametro é passado
+            Returns:
+                uma lista de todos os veiculos listados na tabela no banco de dados
+            Raises:
+                caso nenhum veiculo seja encontrado: 404, not found
+        """
         caminhao_cursor = db.caminhao.find()
         caminhao = [CaminhaoInfo.from_mongo(caminhao) for caminhao in await caminhao_cursor.to_list(length=100)]
         
@@ -82,8 +91,18 @@ class ServiceCaminhao:
                 )
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nenhum caminhao inserido!")
         
+
     # Função para converter second_search para o tipo adequado
     def convert_search_value(value: str, campo: str):
+        """
+        Args:
+            value recebe um numero inteiro relacionado ao valor do campo
+            campo recebe o valor e verifica se é possivel consultar com o campo passado
+        Returns:
+            retorna a permissao para a realizacao da consulta
+        Raises:
+            Caso nao seja encontrado campo ou value, erro 400, bad request
+        """
         try:
             # Tentando converter conforme o tipo do campo
             if campo in ["ano", "preco", "quilometragem", "portas", "lugares"]:
@@ -95,6 +114,17 @@ class ServiceCaminhao:
     
     @staticmethod
     async def get_caminhao_with_params(first_params, second_params):
+        """
+        Args:
+            recebe dois tipos de parametros para realizar consulta
+            first_params: sendo string
+            second_params: sendo inteiro
+        Returns:
+            o resultado referente com os parametros de pesquisa 
+        Raises:
+            caso first_params nao esteja setado em campos_validos, retorna 400, bad request
+            caso nao possua carros: 404, not found
+        """
         # Validar se o campo é permitido
         campos_validos = [
             "marca", "modelo", "ano",
@@ -139,6 +169,14 @@ class ServiceCaminhao:
     
     @staticmethod
     async def get_caminhao_ID(caminhao_id):
+        """
+        Args:
+            caminhao_id sera passado como um objeto 'json', já que o id é um uuid
+        Return:
+            caso o id esteja no banco de dados, o objeto mongo db é transformando para pydantic, e o valor retornado
+        Raises:
+            caso o carro nao exista: 404, not found
+        """
         try:
             # Tenta converter o caminhao_id para ObjectId, porque o MongoDB trabalha com objetos!
             caminhao_object_id = ObjectId(caminhao_id)
@@ -162,6 +200,14 @@ class ServiceCaminhao:
     
     @staticmethod
     async def render_HTML(request):
+        """
+        Args:
+            request é passao para relaizar a consulta no banco de dados e renderizar no front
+        Returns:
+            os dados retornados nao tratados e renderizados
+        Raises:
+            caso nenhum carro exista: 404, not found
+        """
         caminhao_cursor = db.caminhao.find()
         caminhao = [CaminhaoInfo.from_mongo(caminhao) for caminhao in await caminhao_cursor.to_list(length=100)]
         
@@ -178,6 +224,33 @@ class ServiceCaminhao:
         Cap_Maxima, Quilometragem, Cor, Portas, Lugares,
         Combustivel, Descricao, Endereco, Imagem
         ):
+        """
+        atualiza as informacoes do veiculo
+        Args:
+            Marca (str): A marca do caminhao.
+            Modelo (str): O modelo do caminhao.
+            Ano (int): O ano de fabricação do caminhao.
+            Preco (float): O preço do caminhao.
+            Disponivel (bool): Indica se o caminhao está disponível para venda.
+            Tipo (str): O tipo do caminhao.
+            Cap_Maxima: capacidade maxima do veiculo
+            Quilometragem (float): A quilometragem do caminhao.
+            Cor (str): A cor do caminhao.
+            Portas (int): O número de portas do caminhao.
+            Lugares (int): O número de lugares disponíveis no caminhao.
+            Combustivel (str): O tipo de combustível utilizado pelo caminhao.
+            Descricao (str): Uma descrição detalhada do caminhao.
+            Endereco (str): O endereço onde o caminhao está localizado.
+            Imagem (UploadFile): O arquivo de imagem do caminhao.
+        
+        Return:
+            retorna as informacoes do veiculo ja atualizado
+        
+        Raises:
+            caso o id seja invalido: 400, bad request
+            caso o caminhao nao exista: 404, not found
+
+        """
         try:
             # Tenta converter o caminhao_id para ObjectId, porque o MongoDB trabalha com objetos!
             caminhao_object_id = ObjectId(caminhao_id)
@@ -235,9 +308,18 @@ class ServiceCaminhao:
 
     @staticmethod
     async def delete_caminhao(caminhao_id):
+        """
+        Args:
+            caminhao_id é passado para realilzar consulta no banco de dados
+        Returns:
+            ao deletar veiculo, é retornado status code 204, not content
+        Raises:
+            caso o id seja invalido: 400, bad request
+            caso o carro nao exista: 404, not found
+        """
         try:
             # Tenta converter caminhao_id para ObjectId, porque o MongoDB trabalha com objetos!
-            carro_object_id = ObjectId(caminhao_id)
+            caminhao_object_id = ObjectId(caminhao_id)
         except Exception as e:
             logger.error(
                 msg="Id caminhao invalido!"
@@ -245,7 +327,7 @@ class ServiceCaminhao:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de caminhao inválido!")
 
         # Busca o caminhao no banco de dados
-        caminhao = await db.caminhao.find_one({"_id": carro_object_id})
+        caminhao = await db.caminhao.find_one({"_id": caminhao_object_id})
 
         if not caminhao:
             logger.info(
@@ -254,7 +336,7 @@ class ServiceCaminhao:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Caminhao não encontrado!")
 
         # Exclui o caminhao usando o ObjectId
-        await db.caminhao.delete_one({"_id": carro_object_id})
+        await db.caminhao.delete_one({"_id": caminhao_object_id})
 
         logger.info(
             msg=f"Caminhao excluído com sucesso!"

@@ -3,6 +3,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from fastapi import status
+
 import redis
 import os
 
@@ -13,7 +14,7 @@ client = AsyncIOMotorClient("mongodb://localhost:27017")  # Substitua com sua UR
 db = client["veiculos"]  # O banco de dados para veículos em MongoDB
 
 # Conexão com o Redis
-redis_client_users = redis.Redis(host='localhost', port=6379, db=1)  # Conectando ao banco de dados 0
+redis_client_users = redis.Redis(host='localhost', port=6379, db=1)  # Conectando ao banco de dados 1
 
 # Inicializa a conexão com o Redis
 redis_client_config_rate_limit_middleware = redis.Redis(host='localhost', port=6379, db=0)  # Conectando ao banco de dados 0

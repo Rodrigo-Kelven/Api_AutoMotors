@@ -79,12 +79,10 @@ class ServiceCarros:
         result = await db.carros.insert_one(carro.dict())  # Converte o objeto para um dict
         carro_db = await db.carros.find_one({"_id": result.inserted_id})  # Recupera o carro inserido do banco
 
-
         # logs
         logger.info(
-            msg=f"Carro inserido! "
+            msg=f"Carro inserido! ID: {result.inserted_id}"
         )
-
 
         # Converte para o modelo CarroInfo, incluindo o id
         return CarroInfo.from_mongo(carro_db)
@@ -141,7 +139,6 @@ class ServiceCarros:
     
     @staticmethod
     async def getCarWithParamsService(first_params, second_params):
-
         """
         Args:
             recebe dois tipos de parametros para realizar consulta
@@ -217,7 +214,7 @@ class ServiceCarros:
 
         # Busca o carro no banco de dados
         carro = await db.carros.find_one({"_id": carro_object_id})
-
+        
         if not carro:
             logger.error(
                 msg="Carro não encontrado!"
