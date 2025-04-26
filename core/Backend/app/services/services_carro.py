@@ -1,7 +1,7 @@
 from core.Backend.app.Veiculos.carros.schemas.schema import CarroInfo
 from core.Backend.app.Veiculos.carros.models.models import Carro
 from core.Backend.app.database.database import db
-from core.Backend.app.config.config import app_logger
+from core.Backend.app.config.config import car_logger
 from fastapi.templating import Jinja2Templates
 from fastapi import HTTPException, status
 from bson import ObjectId
@@ -80,7 +80,7 @@ class ServiceCarros:
         carro_db = await db.carros.find_one({"_id": result.inserted_id})  # Recupera o carro inserido do banco
 
         # logs
-        app_logger.info(
+        car_logger.info(
             msg=f"Carro inserido! ID: {result.inserted_id}"
         )
 
@@ -104,13 +104,13 @@ class ServiceCarros:
         carros = [CarroInfo.from_mongo(carro) for carro in await carros_cursor.to_list(length=100)]
         
         if carros:
-            app_logger.info(
+            car_logger.info(
                 msg="Carros sendo listados!"
             )
             return carros
         
         if not carros:
-            app_logger.info(
+            car_logger.info(
                 msg="Nenhum carro inserido!"
             )
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nenhum carro inserido!")
@@ -160,7 +160,7 @@ class ServiceCarros:
         ]
         
         if first_params not in campos_validos:
-            app_logger.error(
+            car_logger.error(
                 msg=f"Campo '{first_params}' não é válido para consulta em {first_params}."
             )
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Campo '{first_params}' não é válido para consulta.")
@@ -173,7 +173,7 @@ class ServiceCarros:
         
         # Usando to_list para pegar os resultados e modificar o _id
         carros = []
-        app_logger.info(
+        car_logger.info(
             msg="Parametros armazenados na lista para retorno"
         )
         async for carro in carros_cursor:
@@ -182,7 +182,7 @@ class ServiceCarros:
         
         # Se não encontrou nenhum carro, retornar um erro
         if not carros:
-            app_logger.info(
+            car_logger.info(
                 msg="Nenhum carro encontrado com os parâmetros fornecidos."
             )
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nenhum carro encontrado com os parâmetros fornecidos.")
@@ -207,7 +207,7 @@ class ServiceCarros:
             carro_object_id = ObjectId(carro_id)
 
         except Exception as e:
-            app_logger.error(
+            car_logger.error(
                 msg="ID de carro inválido!"
             )
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de carro inválido!")
@@ -216,13 +216,13 @@ class ServiceCarros:
         carro = await db.carros.find_one({"_id": carro_object_id})
         
         if not carro:
-            app_logger.error(
+            car_logger.error(
                 msg="Carro não encontrado!"
             )
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Carro não encontrado!")
         
         # logs
-        app_logger.info(
+        car_logger.info(
             msg=f"Informações do carro"
         )
 
@@ -243,7 +243,7 @@ class ServiceCarros:
         carros_cursor = db.carros.find()
         carros = [CarroInfo.from_mongo(carro) for carro in await carros_cursor.to_list(length=100)]
 
-        app_logger.info(
+        car_logger.info(
             msg="Pagina de veiculos leves: carros!"
         )
         return templates.TemplateResponse("index.html", {"request": request, "carros": carros})
@@ -286,7 +286,7 @@ class ServiceCarros:
             # Tenta converter o carro_id para ObjectId, porque o MongoDB trabalha com objetos!
             carro_object_id = ObjectId(carro_id)
         except Exception as e:
-            app_logger.error(
+            car_logger.error(
                 msg="ID de carro inválido!"
             )
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de carro inválido!")
@@ -295,7 +295,7 @@ class ServiceCarros:
         carro = await db.carros.find_one({"_id": carro_object_id})
 
         if not carro:
-            app_logger.error(
+            car_logger.error(
                 msg="Carro não encontrado!"
             )
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Carro não encontrado")
@@ -329,7 +329,7 @@ class ServiceCarros:
         updated_carro = await db.carros.find_one({"_id": carro_object_id})
 
         # logs
-        app_logger.info(
+        car_logger.info(
             msg=f"Carro atualizado!"
         )
         
@@ -352,7 +352,7 @@ class ServiceCarros:
             # Tenta converter o carro_id para ObjectId, porque o MongoDB trabalha com objetos!
             carro_object_id = ObjectId(carro_id)
         except Exception as e:
-            app_logger.error(
+            car_logger.error(
                 msg="ID de carro inválido!"
             )
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de carro inválido!")
@@ -361,7 +361,7 @@ class ServiceCarros:
         carro = await db.carros.find_one({"_id": carro_object_id})
 
         if not carro:
-            app_logger.error(
+            car_logger.error(
                 msg="Carro não encontrado!"
             )
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Carro não encontrado!")
@@ -370,7 +370,7 @@ class ServiceCarros:
         await db.carros.delete_one({"_id": carro_object_id})
 
         # logs
-        app_logger.info(
+        car_logger.info(
             msg=f"Carro deletado!"
         )
 

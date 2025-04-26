@@ -164,6 +164,9 @@ app_logger = setup_logger("app_logger", "logs/app.log", logging.INFO)
 auth_logger = setup_logger("auth_logger", "logs/auth.log", logging.INFO)
 #db_logger = setup_logger("db_logger", "logs/db.log", logging.ERROR)
 db_logger = setup_logger("db_logger", "logs/db.log", logging.INFO)
+car_logger = setup_logger("car_logger", "logs/car.log", logging.INFO)
+truck_logger = setup_logger("truck_logger", "logs/truck.log", logging.INFO)
+bike_logger = setup_logger("bike_logger", "logs/bike.log", logging.INFO)
 
 
 

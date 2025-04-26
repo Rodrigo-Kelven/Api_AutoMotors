@@ -1,4 +1,4 @@
-from core.Backend.app.config.config import app_logger
+from core.Backend.app.config.config import bike_logger
 from core.Backend.app.Veiculos.moto.models.models import Motos
 from core.Backend.app.Veiculos.moto.schemas.schemas import MotosInfo
 from core.Backend.app.database.database import db
@@ -93,13 +93,13 @@ class ServicesMoto:
         motos = [MotosInfo.from_mongo(moto) for moto in await motos_cursor.to_list(length=100)]
 
         if motos:
-            app_logger.info(
+            bike_logger.info(
                 msg="Motos sendo listadas!"
             )
             return motos
         
         if not motos:
-            app_logger.error(
+            bike_logger.error(
                 msg="Nenhuma moto inserida!"
                 )
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nenhuma moto inserido!")
@@ -150,7 +150,7 @@ class ServicesMoto:
         ]
         
         if first_params not in campos_validos:
-            app_logger.error(
+            bike_logger.error(
                 msg=f"Campo '{first_params}' não é válido para consulta em {first_params}."
             )
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Campo '{first_params}' não é válido para consulta.")
@@ -163,7 +163,7 @@ class ServicesMoto:
         
         # Usando to_list para pegar os resultados e modificar o _id
         motos = []
-        app_logger.info(
+        bike_logger.info(
             msg="Parametros armazenados na lista para retorno"
         )
         async for moto in motos_cursor:
@@ -172,7 +172,7 @@ class ServicesMoto:
         
         # Se não encontrou nenhum veiculo, retornar um erro
         if not motos:
-            app_logger.info(
+            bike_logger.info(
                 msg="Nenhuma moto encontrada com os parâmetros fornecidos."
             )
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nenhuma moto encontrada com os parâmetros fornecidos.")
@@ -202,12 +202,12 @@ class ServicesMoto:
         moto = await db.motos.find_one({"_id": moto_object_id})
 
         if not moto:
-            app_logger.info(
+            bike_logger.info(
                 msg="Moto não encontrada!"
             )
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Moto não encontrada")
         
-        app_logger.info(
+        bike_logger.info(
             msg=f"Informações da moto!"
         )
         
@@ -228,7 +228,7 @@ class ServicesMoto:
         motos_cursor = db.motos.find()
         motos = [MotosInfo.from_mongo(moto) for moto in await motos_cursor.to_list(length=100)]
 
-        app_logger.info(
+        bike_logger.info(
             msg="Pagina de veiculos ultra leves: motos!"
         )
         return templates.TemplateResponse("index.html", {"request": request, "carros": motos})
@@ -269,7 +269,7 @@ class ServicesMoto:
             # Tenta converter a moto_id para ObjectId, porque o MongoDB trabalha com objetos!
             moto_object_id = ObjectId(moto_id)
         except Exception as e:
-            app_logger.error(
+            bike_logger.error(
                 msg="Id moto invalido!"
             )
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de moto inválido")
@@ -278,7 +278,7 @@ class ServicesMoto:
         moto = await db.motos.find_one({"_id": moto_object_id})
 
         if not moto:
-            app_logger.error(
+            bike_logger.error(
                 msg="Moto nao encontrada"
             )
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Moto não encontrada!")
@@ -310,7 +310,7 @@ class ServicesMoto:
         # Recupera a moto atualizada
         updated_moto = await db.motos.find_one({"_id": moto_object_id})
 
-        app_logger.info(
+        bike_logger.info(
             msg=f"Moto atualizada!"
         )
         
@@ -331,7 +331,7 @@ class ServicesMoto:
             # Tenta converter o moto_id para ObjectId, porque o MongoDB trabalha com objetos!
             moto_object_id = ObjectId(moto_id)
         except Exception as e:
-            app_logger.error(
+            bike_logger.error(
                 msg="Id moto invalido!"
             )
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de moto inválido")
@@ -340,7 +340,7 @@ class ServicesMoto:
         moto = await db.motos.find_one({"_id": moto_object_id})
 
         if not moto:
-            app_logger.info(
+            bike_logger.info(
                 msg="Moto não encontrada!"
             )
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Moto não encontrada!")
@@ -348,7 +348,7 @@ class ServicesMoto:
         # Exclui a moto usando o ObjectId
         await db.motos.delete_one({"_id": moto_object_id})
 
-        app_logger.info(
+        bike_logger.info(
             msg=f"Moto excluída com sucesso!"
         )
         raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="Moto excluida com sucesso!")
