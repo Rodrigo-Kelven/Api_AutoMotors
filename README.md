@@ -29,10 +29,11 @@ Ele permite que os usuários realizem operações como criar, ler, atualizar e e
 ## Instalação
 ```bash
   git clone https://github.com/Rodrigo-Kelven/Api_AutoMotors
-  cd Api_AutoMotors/app
+  docker-compose up
 ```
 ### Atençao a esta parte! Ela é crucial para o funcionamento da API.
 ```bash
+  cd Api_AutoMotors/core
   pip install -r requirements.txt
   fastapi dev main.py --reload --port 8000
 ```
