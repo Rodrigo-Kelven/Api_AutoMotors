@@ -19,8 +19,8 @@ Ele permite que os usuários realizem operações como criar, ler, atualizar e e
 - [Python](https://www.python.org/) - Linguagem de programação
 - [FastAPI](https://fastapi.tiangolo.com/) - Framework para construção de APIs
 - [SQLAlchemy](https://www.sqlalchemy.org/) - ORM para interagir com o banco de dados
-- [SQLite](https://www.sqlite.org/index.html) - Banco de dados leve (temporariamente para usuarios)
-- [MongoDB](https://hub.docker.com/_/mongo) - Banco de dados NoSQL
+- [PostGreSQL](https://www.postgresql.org/) - Banco de dados para armazenamento dos dados dos usuarios
+- [MongoDB](https://hub.docker.com/_/mongo) - Banco de dados NoSQL para armazenamento dos dados dos veiculos
 - [Redis](https://hub.docker.com/_/redis) - Banco de dados Caching
 - [Pydantic](https://pydantic-docs.helpmanual.io/) - Validação de dados
 - [Docker](https://www.docker.com/) - Conteirização da aplicação
