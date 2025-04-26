@@ -17,7 +17,7 @@ app = FastAPI(
     version="2.1.10"
 )
 
-# chama todas as rotas para o app FastAPI
+# chama todas as rotas para o app FastAPI antes de qualquer processamento
 all_routes(app)
 
 @app.on_event("startup")
