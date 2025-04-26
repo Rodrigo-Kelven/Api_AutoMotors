@@ -1,12 +1,9 @@
 from sqlalchemy.ext.declarative import declarative_base
 from motor.motor_asyncio import AsyncIOMotorClient
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
-from fastapi import status
-
 import redis
-import os
-
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker, declarative_base
 
 
 # Conexão com o MongoDB
@@ -19,44 +16,26 @@ redis_client_users = redis.Redis(host='localhost', port=6379, db=1)  # Conectand
 # Inicializa a conexão com o Redis
 redis_client_config_rate_limit_middleware = redis.Redis(host='localhost', port=6379, db=0)  # Conectando ao banco de dados 0
 
-# Definindo o caminho do banco de dados SQLite
-db_users_path = "./databases/DB_users/db_users/users_users.db" # -> banco de dados de usuarios
+# URL do banco de dados PostgreSQL
+DATABASE_URL = "postgresql+asyncpg://user:password@localhost/fastapi_db"
+
+# Criação do engine assíncrono
+engine_auth = create_async_engine(
+    DATABASE_URL,
+    echo=True,
+    pool_size=20,  # Tamanho do pool de conexões
+    max_overflow=0,  # Conexões adicionais permitidas
+    pool_pre_ping=True, # Verifica se a conexão está ativa antes de se conectar
+)
+
+# Criação do gerenciador de sessões assíncronas
+AsyncSessionLocal = sessionmaker(bind=engine_auth, class_=AsyncSession, expire_on_commit=False)
 
 
-# Verificar se a pasta existe, caso contrário, criar
-db_directory_users = os.path.dirname(db_users_path)
+# Criação da base para os modelos
+Base_auth = declarative_base()
 
-# verifica se o diretorio existe
-if not os.path.exists(db_directory_users):
-    os.makedirs(db_directory_users)  # Cria o diretório se não existir
-
-# URL do banco de dados SQLite dentro da pasta 'databases'
-SQLALCHEMY_DATABASE_api_automotors_users_URL = f"sqlite:///{db_users_path}"
-
-# Criando o engine para conectar ao banco de dados, aqui esta criando uma ponte para ai sim conectar a aplicacao ao DB e executar as operacoes
-engine_automotors_users = create_engine(SQLALCHEMY_DATABASE_api_automotors_users_URL, connect_args={"check_same_thread": False})
-
-
-# Testando a conexão, db users
-try:
-    with engine_automotors_users.connect():
-        print(f"Conexão bem-sucedida!: status {status.HTTP_200_OK}")
-        
-except Exception as e:
-    print(f"Error de conexão, status: {e}")
-   
-
-
-# Sessão para interagir com o banco de dados, essa sesao é muito importante, ela é responsavel por 'manter uma sessao'
-SessionLocal_users = sessionmaker(autocommit=False, autoflush=False, bind=engine_automotors_users)
-
-# Base para definir os modelos
-Base = declarative_base()
-
-# Dependência para obter a sessão do banco de dados de usuários
-def get_db_users():
-    db_users = SessionLocal_users()
-    try:
-        yield db_users
-    finally:
-        db_users.close()
+# Função para obter a sessão de banco de dados
+async def get_user_db():
+    async with AsyncSessionLocal() as session:
+        yield session

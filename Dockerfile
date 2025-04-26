@@ -8,7 +8,7 @@ WORKDIR /src
 COPY . .
 
 # Instala as dependências necessárias
-RUN pip install  -r requirements.txt
+RUN pip install  -r core/Backend/requirements.txt
 
 # Expondo a porta 8000 para o host
 EXPOSE 8000

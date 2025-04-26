@@ -28,11 +28,16 @@ class UserResponse(BaseModel):
     role: str
 
 
-class UserResponseUpdate(BaseModel):
+class UserResponseEdit(BaseModel):
+    username: str
     email: str
     full_name: str
-    hashed_password: str
-    disabled: bool
+
+
+class UserResponseCreate(BaseModel):
+    username: str
+    email: str
+    full_name: str
 
 
 class UserInDB(User):

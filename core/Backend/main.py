@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from core.Backend.app.database.database import Base, engine_automotors_users
-from core.Backend.app.config.config import LogRequestMiddleware, rate_limit_middleware, cors
+from core.Backend.app.database.database import Base_auth, engine_auth
+from core.Backend.app.config.config import LogRequestMiddleware, rate_limit_middleware, config_CORS
 from fastapi.staticfiles import StaticFiles
 from core.Backend.app.Veiculos.all_routes import all_routes
 
@@ -22,21 +22,29 @@ app = FastAPI(
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.add_middleware(LogRequestMiddleware)
 
-# cria as tabelas ao iniciar a aplicação, sim, deve estar aqui
-Base.metadata.create_all(bind=engine_automotors_users)
 
-# chama todas as rotas para o app FastAPI
-all_routes(app)
+@app.on_event("startup")
+async def startup_event():
+    try:
+        # Criação das tabelas no banco de dados de usuários
+        async with engine_auth.begin() as conn:
+            await conn.run_sync(Base_auth.metadata.create_all)
 
-# Adiciona o middleware ao FastAPI, verifica requests e responses
-app.add_middleware(LogRequestMiddleware)
+        # chama todas as rotas para o app FastAPI
+        all_routes(app)
+        
+        # Adiciona o middleware ao FastAPI, verifica requests e responses
+        app.add_middleware(LogRequestMiddleware)
 
+        # funcao para configuracao do middleware
+        app.middleware("http")(rate_limit_middleware)
 
-# funcao para configuracao do middleware
-app.middleware("http")(rate_limit_middleware)
+        # adicionar CORS para implementacao com o frontend
+        config_CORS(app)
 
-# adicionar CORS para implementacao com o frontend
-cors(app)
+    except Exception as e:
+        return e
 
-
-
+@app.on_event("shutdown")
+async def shutdown_event():
+    await engine_auth.dispose()

@@ -1,7 +1,7 @@
 from core.Backend.app.Veiculos.caminhao.models.models import Caminhao
 from core.Backend.app.Veiculos.caminhao.schemas.schemas import CaminhaoInfo
 from core.Backend.app.database.database import db
-from core.Backend.app.config.config import logger
+from core.Backend.app.config.config import app_logger
 from fastapi.templating import Jinja2Templates
 from fastapi import HTTPException, status
 from bson import ObjectId
@@ -97,13 +97,13 @@ class ServiceCaminhao:
         caminhao = [CaminhaoInfo.from_mongo(caminhao) for caminhao in await caminhao_cursor.to_list(length=100)]
         
         if caminhao:
-            logger.info(
+            app_logger.info(
                 msg="Caminhoes sendo listados!"
             )
             return caminhao
         
         if not caminhao:
-            logger.error(
+            app_logger.error(
                 msg="Nenhum caminhao inserido!"
                 )
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nenhum caminhao inserido!")
@@ -152,7 +152,7 @@ class ServiceCaminhao:
         ]
         second_params
         if first_params not in campos_validos:
-            logger.error(
+            app_logger.error(
                 msg=f"Campo '{first_params}' não é válido para consulta em {first_params}."
             )
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Campo '{first_params}' não é válido para consulta.")
@@ -165,7 +165,7 @@ class ServiceCaminhao:
         
         # Usando to_list para pegar os resultados e modificar o _id
         caminhoes = []
-        logger.info(
+        app_logger.info(
             msg="Parametros armazenados na lista para retorno"
         )
         async for caminhao in caminhao_cursor:
@@ -174,7 +174,7 @@ class ServiceCaminhao:
         
         # Se não encontrou nenhum carro, retornar um erro
         if not caminhoes:
-            logger.info(
+            app_logger.info(
                 msg="Nenhum caminhão encontrado com os parâmetros fornecidos."
             )
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nenhum caminhão encontrado com os parâmetros fornecidos.")
@@ -204,12 +204,12 @@ class ServiceCaminhao:
         caminhao = await db.caminhao.find_one({"_id": caminhao_object_id})
 
         if not caminhao:
-            logger.info(
+            app_logger.info(
                 msg="Caminhao não encontrado!"
             )
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Caminhao não encontrado!")
         
-        logger.info(
+        app_logger.info(
             msg=f"Informações da caminhao!"
         )
         # Retorna o caminhao no formato adequado, com o id convertido
@@ -229,7 +229,7 @@ class ServiceCaminhao:
         caminhao_cursor = db.caminhao.find()
         caminhao = [CaminhaoInfo.from_mongo(caminhao) for caminhao in await caminhao_cursor.to_list(length=100)]
         
-        logger.info(
+        app_logger.info(
             msg="Pagina de veiculos pesados: caminhões!"
         )
         return templates.TemplateResponse("index.html", {"request": request, "carros": caminhao})
@@ -272,7 +272,7 @@ class ServiceCaminhao:
             # Tenta converter o caminhao_id para ObjectId, porque o MongoDB trabalha com objetos!
             caminhao_object_id = ObjectId(caminhao_id)
         except Exception as e:
-            logger.error(
+            app_logger.error(
                 msg="ID de caminhao inválido!"
             )
             raise HTTPException(status_code=400, detail="ID de caminhao inválido!")
@@ -281,7 +281,7 @@ class ServiceCaminhao:
         caminhao = await db.caminhao.find_one({"_id": caminhao_object_id})
 
         if not caminhao:
-            logger.info(
+            app_logger.info(
                 msg="Caminhao não encontrado!"
             )
             raise HTTPException(status_code=404, detail="Caminhao não encontrado!")
@@ -315,7 +315,7 @@ class ServiceCaminhao:
         # Recupera o caminhao atualizado
         updated_caminhao = await db.caminhao.find_one({"_id": caminhao_object_id})
         
-        logger.info(
+        app_logger.info(
             msg=f"Caminhao atualizado!"
         )
 
@@ -338,7 +338,7 @@ class ServiceCaminhao:
             # Tenta converter caminhao_id para ObjectId, porque o MongoDB trabalha com objetos!
             caminhao_object_id = ObjectId(caminhao_id)
         except Exception as e:
-            logger.error(
+            app_logger.error(
                 msg="Id caminhao invalido!"
             )
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de caminhao inválido!")
@@ -347,7 +347,7 @@ class ServiceCaminhao:
         caminhao = await db.caminhao.find_one({"_id": caminhao_object_id})
 
         if not caminhao:
-            logger.info(
+            app_logger.info(
                 msg="Caminhao não encontrado!"
             )
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Caminhao não encontrado!")
@@ -355,7 +355,7 @@ class ServiceCaminhao:
         # Exclui o caminhao usando o ObjectId
         await db.caminhao.delete_one({"_id": caminhao_object_id})
 
-        logger.info(
+        app_logger.info(
             msg=f"Caminhao excluído com sucesso!"
         )
         raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="Caminhao excluido com sucesso!")

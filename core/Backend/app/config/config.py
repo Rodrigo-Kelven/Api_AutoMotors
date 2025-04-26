@@ -1,10 +1,12 @@
 from core.Backend.app.database.database import redis_client_config_rate_limit_middleware
 from starlette.middleware.base import BaseHTTPMiddleware
+from logging.handlers import RotatingFileHandler
 from fastapi import Request, HTTPException
 from starlette.requests import Request
 from starlette.responses import Response
 import logging
 import time
+import os
 
 
 logging.basicConfig(level=logging.INFO)
@@ -37,6 +39,9 @@ async def rate_limit_middleware(request: Request, call_next):
     now = int(time.time())
 
     # Obtém a contagem atual e o timestamp do Redis
+    db_logger.info(
+        msg="Usando Redis."
+    )
     print("##################")
     print("Usando Redis")
     print("##################")
@@ -64,6 +69,8 @@ async def rate_limit_middleware(request: Request, call_next):
         # Removi a linha de expiração do timestamp
         # Neste caso, o timestamp continuará existindo no Redis, mas ele será sobrescrito quando o contador for zerado novamente, então não há problema em não expirá-lo.
 
+
+    print(f"Count: {count}, Rate Limit: {RATE_LIMIT}, Now: {now}, Timestamp: {timestamp}")
 
     # Verifica se o limite foi atingido
     if count >= RATE_LIMIT:
@@ -101,7 +108,8 @@ async def rate_limit_middleware(request: Request, call_next):
 """
 
 
-def cors(app):
+# caso precise de mais configuracao, documente e especifique porque
+def config_CORS(app):
     from fastapi.middleware.cors import CORSMiddleware
 
     origins = [
@@ -112,19 +120,60 @@ def cors(app):
     ]
 
     app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
-    allow_headers=["Content-Type", "Authorization"],
-    expose_headers=["X-Custom-Header"],
-    max_age=3600,
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "DELETE"],
+        allow_headers=["Content-Type", "Authorization"],
+        expose_headers=["X-Custom-Header"],
+        max_age=3600,
     )
 
 
-# Configurar o registro
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    handlers=[logging.StreamHandler()])
+"""
+### Resumo visual
+### Nível configurado	Logs que ele aceita
+-----------------------------------------------
+* DEBUG	    DEBUG, INFO, WARNING, ERROR, CRITICAL
+* INFO	    INFO, WARNING, ERROR, CRITICAL
+* WARNING	WARNING, ERROR, CRITICAL
+* ERROR	    ERROR, CRITICAL
+* CRITICAL	CRITICAL
+"""
 
-logger = logging.getLogger(__name__)
+
+
+os.makedirs("logs", exist_ok=True)
+# Formato padrão
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+def setup_logger(name, log_file, level=logging.INFO):
+    """Cria e retorna um logger com arquivo próprio."""
+    handler = RotatingFileHandler(log_file, maxBytes=5_000_000, backupCount=3)
+    handler.setFormatter(formatter)
+
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    logger.addHandler(handler)
+    logger.propagate = False  # Evita que os logs se repitam no console
+
+    return logger
+
+# Loggers separados
+app_logger = setup_logger("app_logger", "logs/app.log", logging.INFO)
+auth_logger = setup_logger("auth_logger", "logs/auth.log", logging.INFO)
+#db_logger = setup_logger("db_logger", "logs/db.log", logging.ERROR)
+db_logger = setup_logger("db_logger", "logs/db.log", logging.INFO)
+
+
+
+# Configurar o log de Request e Response
+logging.basicConfig(level=logging.INFO)
+
+
+class LogRequestMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        logging.info(f"Requisição recebida: {request.method} {request.url}")
+        response = await call_next(request)
+        logging.info(f"Resposta enviada com status {response.status_code}")
+        return response

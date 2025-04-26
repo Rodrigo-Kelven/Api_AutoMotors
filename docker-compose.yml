@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - ~/mongodb-data:/data/db
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    image: redis
+    container_name: redis-container
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    command: ["redis-server", "--bind", "0.0.0.0"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: fastapi_db
+    ports:
+      - "5432:5432"  # Mapeia a porta 5432 do container para a porta 5432 do host
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Volume persistente para armazenar dados do PostgreSQL
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"  # Mapeia a porta 80 do container para a porta 8080 do host
+    depends_on:
+      - db  # Garante que o serviço db esteja em execução antes de iniciar o pgAdmin
+
+
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:  # Define o volume persistente para o PostgreSQL
