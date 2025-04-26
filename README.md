@@ -30,10 +30,10 @@ Ele permite que os usuários realizem operações como criar, ler, atualizar e e
 ```bash
   git clone https://github.com/Rodrigo-Kelven/Api_AutoMotors
   cd Api_AutoMotors/app
-  pip install -r requirements.txt
 ```
 ### Atençao a esta parte! Ela é crucial para o funcionamento da API.
 ```bash
+  pip install -r requirements.txt
   fastapi dev main.py --reload --port 8000
 ```
 
