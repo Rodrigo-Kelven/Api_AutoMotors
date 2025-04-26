@@ -4,7 +4,7 @@
 Este projeto é uma API RESTful para um sistema de uma concéssionária. Um simples projeto baseado num ecommerce construido em FastAPI. A ideia e criar um pequeno sistema e usa-lo como base em outros projetos
 Ele permite que os usuários realizem operações como criar, ler, atualizar e excluir produtos, além de gerenciar pedidos e usuários.
 
-# Versão 1.2.28
+# Versão 2.1.10
 
 ## Tecnologias Utilizadas
 - [Python](https://www.python.org/) - Linguagem de programação
