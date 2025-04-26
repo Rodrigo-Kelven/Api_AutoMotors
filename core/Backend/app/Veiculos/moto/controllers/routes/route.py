@@ -4,9 +4,14 @@ from core.Backend.app.services.services_moto import ServicesMoto
 from core.Backend.auth.auth import get_current_user
 from fastapi.responses import HTMLResponse
 from typing import List, Union
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 
 route_motos = APIRouter()
+
+# decoracor do rate limit
+limiter = Limiter(key_func=get_remote_address)
 
 
 # rota POST 
@@ -18,7 +23,9 @@ route_motos = APIRouter()
         description="Route para criar registro de Moto",
         name="Criar registro para Moto"
 )
+@limiter.limit("5/minute") # O ideal é 5
 async def createBike(
+    request: Request,
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
     Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
@@ -50,7 +57,8 @@ async def createBike(
     description="Route para pegar informações da moto",
     name="Pegar informações do Moto"
 )
-async def getBikes():
+@limiter.limit("40/minute")
+async def getBikes(request: Request):
     # servico de listagem de todos os veiculos leves 'motos'
     return await ServicesMoto.getBikesService()
 
@@ -60,9 +68,10 @@ async def getBikes():
         path="/veiculos-ultra-leves/{first_params}/{second_params}",
         response_model=List[MotosInfoResponse],
         #response_class=HTMLResponse,
-        )
+)
+@limiter.limit("40/minute")
 async def getBikesWithParams(
-    #request: Request,
+    request: Request,
     first_params: str = Path(..., max_length=13, description="Campo a ser consultado no MongoDB" ,example="ano"),
     second_params: Union[str, int, float] = Path(..., description="Valor para filtrar o campo", example="2005"),
 
@@ -80,7 +89,8 @@ async def getBikesWithParams(
     description="Route para pegar informações da moto",
     name="Pegar informações da moto"
 )
-async def getBikeById(moto_id: str):
+@limiter.limit("30/minute")
+async def getBikeById(moto_id: str, request: Request):
     # servico para pegar moto por ID
     return await ServicesMoto.getBikeByIdService(moto_id)
 
@@ -94,6 +104,7 @@ async def getBikeById(moto_id: str):
         name="Renderizar pagina",
         response_class=HTMLResponse
 )
+@limiter.limit("40/minute")
 async def bikePage(request: Request):
     # servico para renderiza dados no HTML
     return await ServicesMoto.getBikePageService(request)
@@ -109,7 +120,9 @@ async def bikePage(request: Request):
     description="Route update information moto",
     name ="Atualizar infomações da moto"
 )
+@limiter.limit("5/minute") # O ideal é 5
 async def updateBike(
+    request: Request,
     moto_id: str,
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
@@ -141,9 +154,11 @@ async def updateBike(
     description="Route delete moto",
     name="Deletar Moto"
 )
+@limiter.limit("10/minute") # O ideal é 5
 async def deleteBike(
+    request: Request,
     moto_id: str,
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
-    ):
+):
     # servico de delete
     return await ServicesMoto.deleteBikeService(moto_id)

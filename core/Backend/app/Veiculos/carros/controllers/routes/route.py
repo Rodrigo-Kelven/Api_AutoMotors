@@ -4,9 +4,14 @@ from core.Backend.app.services.services_carro import ServiceCarros
 from core.Backend.auth.auth import get_current_user
 from fastapi.responses import HTMLResponse
 from typing import List, Union
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 
 router_carros = APIRouter()
+
+# decoracor do rate limit
+limiter = Limiter(key_func=get_remote_address)
 
 
 # Rota POST para criar um carro
@@ -18,7 +23,9 @@ router_carros = APIRouter()
     description="Route para criar registro de carro",
     name="Criar registro para Carro"
 )
+@limiter.limit("5/minute") # O ideal é 5
 async def createCar(
+    request: Request,
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
     Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
@@ -52,7 +59,8 @@ async def createCar(
     description="Route para pegar informações do carro",
     name="Pegar informações do Carro"
 )
-async def getCars():
+@limiter.limit("40/minute")
+async def getCars(request: Request):
 
     # servico para retonar todos os carros
     return await ServiceCarros.getCarsService()
@@ -64,9 +72,10 @@ async def getCars():
         path="/veiculos-leves/{first_params}/{second_params}",
         response_model=List[CarroInfoResponse],
         #response_class=HTMLResponse,
-        )
+)
+@limiter.limit("40/minute")
 async def getCarsWithParams(
-    #request: Request,
+    request: Request,
     first_params: str = Path(..., max_length=13, description="Campo que deseja requisitar" ,example="ano"),
     second_params: Union[str, int, float] = Path(..., description="Valor do campo para filtragem.", example="2005"),
 
@@ -82,7 +91,8 @@ async def getCarsWithParams(
     description="Route para pegar informações do carro",
     name="Pegar informações do Carro"
 )
-async def getCarById(carro_id: str):
+@limiter.limit("30/minute")
+async def getCarById(carro_id: str, request: Request):
     # servico para pegar informacoes do carro
     return await ServiceCarros.getCarByIdService(carro_id)
 
@@ -96,6 +106,7 @@ async def getCarById(carro_id: str):
     name="Renderização da página",
     response_class=HTMLResponse
 )
+@limiter.limit("40/minute")
 async def getCarPage(request: Request):
     return await ServiceCarros.getCarPageService(request)
 
@@ -109,7 +120,9 @@ async def getCarPage(request: Request):
     description="Route update informações do carro",
     name="Atualizar informações do Carro"
 )
+@limiter.limit("5/minute") # O ideal é 5
 async def updateCar(
+    request: Request,
     carro_id: str,
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
@@ -143,10 +156,11 @@ async def updateCar(
     description="Route delete carro",
     name="Delete Carro"
 )
+@limiter.limit("10/minute") # O ideal é 5
 async def deleteCarById(
+    request: Request,
     carro_id: str,
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
-    ):
-
+):
     # servico para deletar carro
     return await ServiceCarros.deleteCarByIdService(carro_id)
