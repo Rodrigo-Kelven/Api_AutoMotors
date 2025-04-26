@@ -4,9 +4,14 @@ from core.Backend.app.services.services_caminhao import ServiceCaminhao
 from core.Backend.auth.auth import get_current_user
 from fastapi.responses import HTMLResponse
 from typing import List, Union
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 
 router_caminhoes = APIRouter()
+
+# decoracor do rate limit
+limiter = Limiter(key_func=get_remote_address)
 
 
 # rota POST 
@@ -21,7 +26,9 @@ router_caminhoes = APIRouter()
 # dividir por categorias, schema, models, categoria pra cada um
 # rael, esses forms devem estar somente no front, os dados serao enviado em forma de forms diretamente para o db, junto com a imagem
 # entao esses forms dessa rota sairao, ou nao, sla, veremos ao desenrolar do projeto
+@limiter.limit("5/minute") # O ideal é 5
 async def createTruck(
+    request: Request,
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
     Ano: int = Form(..., title="Ano do veiculo", alias="Ano", description="Ano do veiculo"),
@@ -37,7 +44,7 @@ async def createTruck(
     Descricao: str = Form(..., title="Descriçao do veiculo", alias="Descricao", description="Descricao do veiculo"),
     Endereco: str = Form(..., title="Endereco", alias="Endereco", description="Endereco"),
     Imagem: UploadFile = File(..., title="Imagem do veiculo", alias="Imagem", description="Imagem do veiculo"),
-    current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
+    current_user: str = Depends(get_current_user),
 ):
     # servico de registro de caminhao
     return await ServiceCaminhao.createTruckservice(
@@ -56,7 +63,8 @@ async def createTruck(
         description="Route para pegar informacoes do caminhao",
         name="Pegar informacoes do Caminhao"
 )
-async def getTrucks():
+@limiter.limit("40/minute")
+async def getTrucks(request: Request):
     # servico para retornar todos os caminhos do banco de dados
     return await ServiceCaminhao.getTrucksService()
 
@@ -66,9 +74,10 @@ async def getTrucks():
         path="/veiculos-pesados/{first_params}/{second_params}",
         response_model=List[CaminhaoInfoResponse],
         #response_class=HTMLResponse,
-        )
+)
+@limiter.limit("40/minute")
 async def getTrucksWithParams(
-    #request: Request,
+    request: Request,
     first_params: str = Path(..., max_length=13, description="Campo a ser consultado no MongoDB" ,example="ano"),
     second_params: Union[str, int, float] = Path(..., description="Valor para filtrar o campo", example="2005"),
 
@@ -85,7 +94,8 @@ async def getTrucksWithParams(
     description="Route para pegar informações do caminhao",
     name="Pegar informações do Caminhao"
 )
-async def getTruckById(caminhao_id: str):
+@limiter.limit("30/minute")
+async def getTruckById(caminhao_id: str, request: Request):
     # servico para retornar dados com base o ID do caminhao
     return await ServiceCaminhao.getTruckByIdService(caminhao_id)
 
@@ -99,6 +109,7 @@ async def getTruckById(caminhao_id: str):
         name="Renderizacao da pagina",
         response_class=HTMLResponse
 )
+@limiter.limit("40/minute")
 async def truckPage(request: Request):
     # servico para renderiza as informacoes no HTML
     return await ServiceCaminhao.getTruckPageService(request)
@@ -112,7 +123,9 @@ async def truckPage(request: Request):
     description="Route update informações do Caminhao",
     name ="Atualizar informações do Caminhao"
 )
+@limiter.limit("5/minute") # O ideal é 5
 async def updateTruck(
+    request: Request,
     caminhao_id: str,
     Marca: str = Form(..., title="Marca do veiculo", alias="Marca", description="Marca do veiculo" ),
     Modelo: str = Form(..., title="Modelo do veiculo", alias="Modelo", description="Modelo do veiculo"),
@@ -148,9 +161,11 @@ async def updateTruck(
     description="Route delete caminhao",
     name="Delete Carro"
 )
+@limiter.limit("10/minute") # O ideal é 5
 async def deleteTruck(
+    request: Request,
     caminhao_id: str,
     current_user: str = Depends(get_current_user)  # Garante que o usuário está autenticado
-    ):
+):
     # servico para delete de caminhao somente com ID
     return await ServiceCaminhao.deleteTruckService(caminhao_id)
