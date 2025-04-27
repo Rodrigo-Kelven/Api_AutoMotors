@@ -78,9 +78,9 @@ async def create_carro(
 
 
     # logs
-    logger.info(
-        msg=f"Carro inserido: {carro_db["_id"]}"
-    )
+    # logger.info(
+    #     msg=f"Carro inserido: {carro_db["_id"]}"
+    # )
 
     # Converte para o modelo CarroInfo, incluindo o id
     return CarroInfo.from_mongo(carro_db)
@@ -207,9 +207,9 @@ async def get_carros(carro_id: str):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Carro não encontrado!")
     
     # logs
-    logger.info(
-        msg=f"Informações do carro: {carro["_id"]}"
-    )
+    # logger.info(
+    #     msg=f"Informações do carro: {carro["_id"]}"
+    # )
 
     # Retorna o carro no formato adequado, com o id convertido
     return CarroInfo.from_mongo(carro)
@@ -308,9 +308,9 @@ async def update_carro(
     updated_carro = await db.carros.find_one({"_id": carro_object_id})
 
     # logs
-    logger.info(
-        msg=f"Carro atualizado: {updated_carro["_id"]}"
-    )
+    # logger.info(
+    #     msg=f"Carro atualizado: {updated_carro["_id"]}"
+    # )
     
     # Retorna o carro atualizado como CarroInfo
     return CarroInfo.from_mongo(updated_carro)
@@ -350,8 +350,8 @@ async def delete_carro(
     await db.carros.delete_one({"_id": carro_object_id})
 
     # logs
-    logger.info(
-        msg=f"Carro deletado: {carro["_id"]}"
-    )
+    # logger.info(
+    #     msg=f"Carro deletado: {carro["_id"]}"
+    # )
 
     return {"detail": "Carro excluído com sucesso"}

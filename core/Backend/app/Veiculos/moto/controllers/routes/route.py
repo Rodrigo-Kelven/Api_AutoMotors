@@ -124,9 +124,9 @@ async def list_veiculos(moto_id: str):
         )
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Moto não encontrada")
     
-    logger.info(
-        msg=f"Informações da moto: {moto["_id"]}"
-    )
+    # logger.info(
+    #     msg=f"Informações da moto: {moto["_id"]}"
+    # )
     
     # Retorna a moto no formato adequado, com o id convertido
     return MotosInfo.from_mongo(moto)
@@ -224,9 +224,9 @@ async def update_veiculo(
     # Recupera a moto atualizada
     updated_moto = await db.motos.find_one({"_id": moto_object_id})
 
-    logger.info(
-        msg=f"Moto atualizada: {moto["_id"]}"
-    )
+    # logger.info(
+    #     msg=f"Moto atualizada: {moto["_id"]}"
+    # )
     
     # Retorna a moto atualizado como MotoInfo
     return MotosInfo.from_mongo(updated_moto)
@@ -265,7 +265,7 @@ async def delete_carro(
     # Exclui a moto usando o ObjectId
     await db.motos.delete_one({"_id": moto_object_id})
 
-    logger.info(
-        msg=f"Moto excluída com sucesso! {moto["_id"]}"
-    )
+    # logger.info(
+    #     msg=f"Moto excluída com sucesso! {moto["_id"]}"
+    # )
     raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="Moto excluida com sucesso!")
