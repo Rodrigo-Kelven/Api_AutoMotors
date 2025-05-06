@@ -7,6 +7,8 @@ from starlette.responses import Response
 import logging
 import time
 import os
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 
 logging.basicConfig(level=logging.INFO)
@@ -180,3 +182,9 @@ class LogRequestMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         logging.info(f"Resposta enviada com status {response.status_code}")
         return response
+
+# decoracor do rate limit de auth
+limiter = Limiter(
+    key_func=get_remote_address,
+    enabled=True,
+    )

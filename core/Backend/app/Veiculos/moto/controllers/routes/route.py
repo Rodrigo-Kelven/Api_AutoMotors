@@ -4,14 +4,10 @@ from core.Backend.app.services.services_moto import ServicesMoto
 from core.Backend.auth.auth import get_current_user
 from fastapi.responses import HTMLResponse
 from typing import List, Union
-from slowapi import Limiter
-from slowapi.util import get_remote_address
+from core.Backend.app.config.config import limiter
 
 
 route_motos = APIRouter()
-
-# decoracor do rate limit
-limiter = Limiter(key_func=get_remote_address)
 
 
 # rota POST 
