@@ -9,7 +9,11 @@ import os
 
 
 # Configura o diretório de templates
-templates = Jinja2Templates(directory="templates")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+templates_dir = os.path.join(BASE_DIR, "templates")
+
+templates = Jinja2Templates(directory=templates_dir)
+
 
 # verifica se a pasta existe
 UPLOAD_DIRECTORY = "uploads"

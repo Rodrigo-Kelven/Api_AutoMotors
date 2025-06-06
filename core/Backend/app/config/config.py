@@ -50,14 +50,13 @@ async def rate_limit_middleware(request: Request, call_next):
     count = redis_client_config_rate_limit_middleware.get(f"rate_limit:{client_ip}:count")
     timestamp = redis_client_config_rate_limit_middleware.get(f"rate_limit:{client_ip}:timestamp")
 
-    # Se não houver contagem, inicializa
     if count is None or timestamp is None:
         count = 0
         timestamp = now
-        redis_client_config_rate_limit_middleware.set(f"rate_limit:{client_ip}:count", count)
-        redis_client_config_rate_limit_middleware.set(f"rate_limit:{client_ip}:timestamp", timestamp)
-        redis_client_config_rate_limit_middleware.expire(f"rate_limit:{client_ip}:count", TIME_WINDOW)
-        redis_client_config_rate_limit_middleware.expire(f"rate_limit:{client_ip}:timestamp", TIME_WINDOW)
+    else:
+        count = int(count)
+        timestamp = int(timestamp)
+
 
     count = int(count)
 
@@ -67,7 +66,7 @@ async def rate_limit_middleware(request: Request, call_next):
         timestamp = now
         redis_client_config_rate_limit_middleware.set(f"rate_limit:{client_ip}:count", count)
         redis_client_config_rate_limit_middleware.set(f"rate_limit:{client_ip}:timestamp", timestamp)
-        redis_client_config_rate_limit_middleware.expire(f"rate_limit:{client_ip}:count", TIME_WINDOW)
+        #redis_client_config_rate_limit_middleware.expire(f"rate_limit:{client_ip}:count", TIME_WINDOW)
         # Removi a linha de expiração do timestamp
         # Neste caso, o timestamp continuará existindo no Redis, mas ele será sobrescrito quando o contador for zerado novamente, então não há problema em não expirá-lo.
 
@@ -171,17 +170,6 @@ truck_logger = setup_logger("truck_logger", "logs/truck.log", logging.INFO)
 bike_logger = setup_logger("bike_logger", "logs/bike.log", logging.INFO)
 
 
-
-# Configurar o log de Request e Response
-logging.basicConfig(level=logging.INFO)
-
-
-class LogRequestMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        logging.info(f"Requisição recebida: {request.method} {request.url}")
-        response = await call_next(request)
-        logging.info(f"Resposta enviada com status {response.status_code}")
-        return response
 
 # decoracor do rate limit de auth
 limiter = Limiter(

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from core.Backend.app.database.database import Base_auth, engine_auth
-from core.Backend.app.config.config import LogRequestMiddleware, rate_limit_middleware, config_CORS
+from core.Backend.app.config.config import config_CORS, LogRequestMiddleware, rate_limit_middleware
 from fastapi.staticfiles import StaticFiles
 from core.Backend.app.Veiculos.all_routes import all_routes
 from core.Backend.app.config.config import db_logger, app_logger

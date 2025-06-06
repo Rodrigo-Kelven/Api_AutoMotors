@@ -7,17 +7,18 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 
 # Conexão com o MongoDB
-client = AsyncIOMotorClient("mongodb://localhost:27017")  # Substitua com sua URL do MongoDB
+client = AsyncIOMotorClient("mongodb://mongodb:27017")  # Substitua com sua URL do MongoDB
 db = client["veiculos"]  # O banco de dados para veículos em MongoDB
 
 # Conexão com o Redis
-redis_client_users = redis.Redis(host='localhost', port=6379, db=1)  # Conectando ao banco de dados 1
+redis_client_users = redis.Redis(host='redis-container', port=6379, db=1)  # Conectando ao banco de dados 1
 
 # Inicializa a conexão com o Redis
-redis_client_config_rate_limit_middleware = redis.Redis(host='localhost', port=6379, db=0)  # Conectando ao banco de dados 0
+redis_client_config_rate_limit_middleware = redis.Redis(host='redis-container', port=6379, db=0)  # Conectando ao banco de dados 0
 
 # URL do banco de dados PostgreSQL
-DATABASE_URL = "postgresql+asyncpg://user:password@localhost/fastapi_db"
+DATABASE_URL = "postgresql+asyncpg://user:password@api_automotors-db-1:5432/fastapi_db"
+
 
 # Criação do engine assíncrono
 engine_auth = create_async_engine(

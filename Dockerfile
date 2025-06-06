@@ -3,6 +3,7 @@ FROM python:3.11-slim
 
 # Define o diretório de trabalho no container
 WORKDIR /src
+RUN pip install --upgrade pip
 
 # Copia todos os arquivos para o diretório de trabalho
 COPY . .

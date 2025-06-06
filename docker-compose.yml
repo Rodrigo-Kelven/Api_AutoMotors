@@ -2,12 +2,12 @@ version: '3.8'
 
 services:
   mongodb:
-    image: mongo
+    image: mongo:4.4
     container_name: mongodb
     ports:
       - "27017:27017"
     volumes:
-      - ~/mongodb-data:/data/db
+      - mongodb_data:/data/db
     networks:
       - app-network
     healthcheck:
@@ -40,6 +40,8 @@ services:
       - "5432:5432"  # Mapeia a porta 5432 do container para a porta 5432 do host
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Volume persistente para armazenar dados do PostgreSQL
+    networks:
+      - app-network
 
   pgadmin:
     image: dpage/pgadmin4
@@ -50,7 +52,26 @@ services:
       - "5050:80"  # Mapeia a porta 80 do container para a porta 8080 do host
     depends_on:
       - db  # Garante que o serviço db esteja em execução antes de iniciar o pgAdmin
+    networks:
+      - app-network
 
+  app:
+    build:
+      context: .  # Caminho para o diretório onde está o seu Dockerfile
+      dockerfile: Dockerfile  # Se você tiver um nome de Dockerfile diferente, pode especificá-lo aqui
+    container_name: my-app
+    networks:
+      - app-network
+    ports:
+      - "8000:8000"  # Mapeando a porta 8000 do container para a 8000 do host
+    volumes:
+      - ./core:/src/core  # Mapeando o código fonte da aplicação do host para o container
+      - ./core/Backend/uploads:/scr/core/Backend/uploads
+    depends_on:
+      - db
+      - redis
+      - mongodb
+    restart: unless-stopped  # Garantir que o container reinicie automaticamente se falhar
 
 
 networks:
@@ -59,3 +80,4 @@ networks:
 
 volumes:
   postgres_data:  # Define o volume persistente para o PostgreSQL
+  mongodb_data:
