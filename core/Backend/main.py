@@ -14,7 +14,7 @@ app = FastAPI(
     "concéssionária. Um simples projeto baseado num ecommerce construido em FastAPI."
     "A ideia e criar um pequeno sistema e usa-lo como base em outros projetos."
     "Ele permite que os usuários realizem operações como criar, ler, atualizar e excluir produtos, além de gerenciar pedidos e usuários.",
-    version="2.1.10"
+    version="2.2.0"
 )
 
 # Monta o diretório de uploads para servir imagens
