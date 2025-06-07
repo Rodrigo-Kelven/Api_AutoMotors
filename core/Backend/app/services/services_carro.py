@@ -1,6 +1,6 @@
 from core.Backend.app.Veiculos.carros.schemas.schema import CarroInfo
 from core.Backend.app.Veiculos.carros.models.models import Carro
-from core.Backend.app.database.database import db
+from core.Backend.app.database.database import db_leves
 from core.Backend.app.config.config import car_logger
 from fastapi.templating import Jinja2Templates
 from fastapi import HTTPException, status
@@ -76,8 +76,8 @@ class ServiceCarros:
 
 
         # Salva o carro no MongoDB
-        result = await db.carros.insert_one(carro.dict())  # Converte o objeto para um dict
-        carro_db = await db.carros.find_one({"_id": result.inserted_id})  # Recupera o carro inserido do banco
+        result = await db_leves.carros.insert_one(carro.dict())  # Converte o objeto para um dict
+        carro_db = await db_leves.carros.find_one({"_id": result.inserted_id})  # Recupera o carro inserido do banco
 
         # logs
         car_logger.info(
@@ -100,7 +100,7 @@ class ServiceCarros:
             Caso nao exista nenhum carro no banco de dados, not fount 404
         """
 
-        carros_cursor = db.carros.find()
+        carros_cursor = db_leves.carros.find()
         carros = [CarroInfo.from_mongo(carro) for carro in await carros_cursor.to_list(length=100)]
         
         if carros:
@@ -169,7 +169,7 @@ class ServiceCarros:
         converted_value = ServiceCarros.convert_search_value(second_params, first_params)
         
         # Consulta para pegar os itens com o campo first_query igual a second_search
-        carros_cursor = db.carros.find({first_params: converted_value})
+        carros_cursor = db_leves.carros.find({first_params: converted_value})
         
         # Usando to_list para pegar os resultados e modificar o _id
         carros = []
@@ -213,7 +213,7 @@ class ServiceCarros:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de carro inválido!")
 
         # Busca o carro no banco de dados
-        carro = await db.carros.find_one({"_id": carro_object_id})
+        carro = await db_leves.carros.find_one({"_id": carro_object_id})
         
         if not carro:
             car_logger.error(
@@ -240,7 +240,7 @@ class ServiceCarros:
         Raises:
             caso nenhum carro exista: 404, not found
         """
-        carros_cursor = db.carros.find()
+        carros_cursor = db_leves.carros.find()
         carros = [CarroInfo.from_mongo(carro) for carro in await carros_cursor.to_list(length=100)]
 
         car_logger.info(
@@ -292,7 +292,7 @@ class ServiceCarros:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de carro inválido!")
 
         # Busca o carro no banco de dados
-        carro = await db.carros.find_one({"_id": carro_object_id})
+        carro = await db_leves.carros.find_one({"_id": carro_object_id})
 
         if not carro:
             car_logger.error(
@@ -323,10 +323,10 @@ class ServiceCarros:
             update_data["imagem"] = file_location
 
         # Atualiza o carro no banco de dados
-        await db.carros.update_one({"_id": carro_object_id}, {"$set": update_data})
+        await db_leves.carros.update_one({"_id": carro_object_id}, {"$set": update_data})
         
         # Recupera o carro atualizado
-        updated_carro = await db.carros.find_one({"_id": carro_object_id})
+        updated_carro = await db_leves.carros.find_one({"_id": carro_object_id})
 
         # logs
         car_logger.info(
@@ -358,7 +358,7 @@ class ServiceCarros:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de carro inválido!")
 
         # Busca o carro no banco de dados
-        carro = await db.carros.find_one({"_id": carro_object_id})
+        carro = await db_leves.carros.find_one({"_id": carro_object_id})
 
         if not carro:
             car_logger.error(
@@ -367,7 +367,7 @@ class ServiceCarros:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Carro não encontrado!")
 
         # Exclui o carro usando o ObjectId
-        await db.carros.delete_one({"_id": carro_object_id})
+        await db_leves.carros.delete_one({"_id": carro_object_id})
 
         # logs
         car_logger.info(

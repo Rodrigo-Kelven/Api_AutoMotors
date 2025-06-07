@@ -8,7 +8,9 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 # Conexão com o MongoDB
 client = AsyncIOMotorClient("mongodb://mongodb:27017")  # Substitua com sua URL do MongoDB
-db = client["veiculos"]  # O banco de dados para veículos em MongoDB
+db_leves = client["veiculos_leves"]  # O banco de dados para veículos leve em MongoDB
+db_pesados = client["veiculos_pesados"] # O banco de dados para veículos pesados em MongoDB
+db_ultra_leves = client["veiculos_ultra_leves"] # O banco de dados para veículos ultra leves em MongoDB
 
 # Conexão com o Redis
 redis_client_users = redis.Redis(host='redis-container', port=6379, db=1)  # Conectando ao banco de dados 1

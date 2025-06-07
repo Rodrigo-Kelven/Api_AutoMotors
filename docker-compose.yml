@@ -15,6 +15,23 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+  
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - app-network
+
 
   redis:
     image: redis
@@ -30,6 +47,7 @@ services:
       timeout: 10s
       retries: 5
   
+
   db:
     image: postgres:17
     environment:
@@ -43,6 +61,7 @@ services:
     networks:
       - app-network
 
+
   pgadmin:
     image: dpage/pgadmin4
     environment:
@@ -54,6 +73,7 @@ services:
       - db  # Garante que o serviço db esteja em execução antes de iniciar o pgAdmin
     networks:
       - app-network
+
 
   app:
     build:
@@ -67,6 +87,7 @@ services:
     volumes:
       - ./core:/src/core  # Mapeando o código fonte da aplicação do host para o container
       - ./core/Backend/uploads:/scr/core/Backend/uploads
+      - ./core/Backend/logs:/scr/logs # espelha os logs 
     depends_on:
       - db
       - redis
@@ -77,6 +98,7 @@ services:
 networks:
   app-network:
     driver: bridge
+
 
 volumes:
   postgres_data:  # Define o volume persistente para o PostgreSQL

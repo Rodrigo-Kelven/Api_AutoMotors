@@ -1,7 +1,7 @@
 from core.Backend.app.config.config import bike_logger
 from core.Backend.app.Veiculos.moto.models.models import Motos
 from core.Backend.app.Veiculos.moto.schemas.schemas import MotosInfo
-from core.Backend.app.database.database import db
+from core.Backend.app.database.database import db_ultra_leves
 from fastapi.templating import Jinja2Templates
 from fastapi import HTTPException, status
 from bson import ObjectId
@@ -72,8 +72,8 @@ class ServicesMoto:
         )
 
         # Salva o moto no MongoDB
-        result = await db.motos.insert_one(moto.dict())  # Converte o objeto para um dict
-        moto_db = await db.motos.find_one({"_id": result.inserted_id})  # Recupera o moto inserido do banco
+        result = await db_ultra_leves.motos.insert_one(moto.dict())  # Converte o objeto para um dict
+        moto_db = await db_ultra_leves.motos.find_one({"_id": result.inserted_id})  # Recupera o moto inserido do banco
         
         # Converte para o modelo MotoInfo, incluindo o id
         return MotosInfo.from_mongo(moto_db)
@@ -89,7 +89,7 @@ class ServicesMoto:
         Raises:
             caso nenhum veiculo seja encontrado: 404, not found
         """
-        motos_cursor = db.motos.find()
+        motos_cursor = db_ultra_leves.motos.find()
         motos = [MotosInfo.from_mongo(moto) for moto in await motos_cursor.to_list(length=100)]
 
         if motos:
@@ -159,7 +159,7 @@ class ServicesMoto:
         converted_value = ServicesMoto.convert_search_value(second_params, first_params)
         
         # Consulta para pegar os itens com o campo first_query igual a second_search
-        motos_cursor = db.motos.find({first_params: converted_value})
+        motos_cursor = db_ultra_leves.motos.find({first_params: converted_value})
         
         # Usando to_list para pegar os resultados e modificar o _id
         motos = []
@@ -199,7 +199,7 @@ class ServicesMoto:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de moto inválido")
 
         # Busca a moto no banco de dados
-        moto = await db.motos.find_one({"_id": moto_object_id})
+        moto = await db_ultra_leves.motos.find_one({"_id": moto_object_id})
 
         if not moto:
             bike_logger.info(
@@ -225,7 +225,7 @@ class ServicesMoto:
         Raises:
             caso nenhum carro exista: 404, not found
         """
-        motos_cursor = db.motos.find()
+        motos_cursor = db_ultra_leves.motos.find()
         motos = [MotosInfo.from_mongo(moto) for moto in await motos_cursor.to_list(length=100)]
 
         bike_logger.info(
@@ -275,7 +275,7 @@ class ServicesMoto:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de moto inválido")
 
         # Busca a moto no banco de dados
-        moto = await db.motos.find_one({"_id": moto_object_id})
+        moto = await db_ultra_leves.motos.find_one({"_id": moto_object_id})
 
         if not moto:
             bike_logger.error(
@@ -305,10 +305,10 @@ class ServicesMoto:
             update_data["imagem"] = file_location
 
         # Atualiza a moto no banco de dados
-        await db.motos.update_one({"_id": moto_object_id}, {"$set": update_data})
+        await db_ultra_leves.motos.update_one({"_id": moto_object_id}, {"$set": update_data})
         
         # Recupera a moto atualizada
-        updated_moto = await db.motos.find_one({"_id": moto_object_id})
+        updated_moto = await db_ultra_leves.motos.find_one({"_id": moto_object_id})
 
         bike_logger.info(
             msg=f"Moto atualizada!"
@@ -337,7 +337,7 @@ class ServicesMoto:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de moto inválido")
 
         # Busca o moto no banco de dados
-        moto = await db.motos.find_one({"_id": moto_object_id})
+        moto = await db_ultra_leves.motos.find_one({"_id": moto_object_id})
 
         if not moto:
             bike_logger.info(
@@ -346,7 +346,7 @@ class ServicesMoto:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Moto não encontrada!")
 
         # Exclui a moto usando o ObjectId
-        await db.motos.delete_one({"_id": moto_object_id})
+        await db_ultra_leves.motos.delete_one({"_id": moto_object_id})
 
         bike_logger.info(
             msg=f"Moto excluída com sucesso!"

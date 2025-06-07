@@ -1,6 +1,6 @@
 from core.Backend.app.Veiculos.caminhao.models.models import Caminhao
 from core.Backend.app.Veiculos.caminhao.schemas.schemas import CaminhaoInfo
-from core.Backend.app.database.database import db
+from core.Backend.app.database.database import db_pesados
 from core.Backend.app.config.config import truck_logger
 from fastapi.templating import Jinja2Templates
 from fastapi import HTTPException, status
@@ -80,8 +80,8 @@ class ServiceCaminhao:
         )
 
         # Salva o caminhao no MongoDB
-        result = await db.caminhao.insert_one(caminhao.dict())  # Converte o objeto para um dict
-        caminhao_db = await db.caminhao.find_one({"_id": result.inserted_id})  # Recupera o carro inserido do banco
+        result = await db_pesados.caminhao.insert_one(caminhao.dict())  # Converte o objeto para um dict
+        caminhao_db = await db_pesados.caminhao.find_one({"_id": result.inserted_id})  # Recupera o carro inserido do banco
         
         # Converte para o modelo CaminhaoInfo, incluindo o id
         return CaminhaoInfo.from_mongo(caminhao_db)
@@ -97,7 +97,7 @@ class ServiceCaminhao:
             Raises:
                 caso nenhum veiculo seja encontrado: 404, not found
         """
-        caminhao_cursor = db.caminhao.find()
+        caminhao_cursor = db_pesados.caminhao.find()
         caminhao = [CaminhaoInfo.from_mongo(caminhao) for caminhao in await caminhao_cursor.to_list(length=100)]
         
         if caminhao:
@@ -165,7 +165,7 @@ class ServiceCaminhao:
         converted_value = ServiceCaminhao.convert_search_value(second_params, first_params)
         
         # Consulta para pegar os itens com o campo first_query igual a second_search
-        caminhao_cursor = db.caminhao.find({first_params: converted_value})
+        caminhao_cursor = db_pesados.caminhao.find({first_params: converted_value})
         
         # Usando to_list para pegar os resultados e modificar o _id
         caminhoes = []
@@ -205,7 +205,7 @@ class ServiceCaminhao:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de caminhao inválido")
 
         # Busca o caminhao no banco de dados
-        caminhao = await db.caminhao.find_one({"_id": caminhao_object_id})
+        caminhao = await db_pesados.caminhao.find_one({"_id": caminhao_object_id})
 
         if not caminhao:
             truck_logger.info(
@@ -230,7 +230,7 @@ class ServiceCaminhao:
         Raises:
             caso nenhum carro exista: 404, not found
         """
-        caminhao_cursor = db.caminhao.find()
+        caminhao_cursor = db_pesados.caminhao.find()
         caminhao = [CaminhaoInfo.from_mongo(caminhao) for caminhao in await caminhao_cursor.to_list(length=100)]
         
         truck_logger.info(
@@ -282,7 +282,7 @@ class ServiceCaminhao:
             raise HTTPException(status_code=400, detail="ID de caminhao inválido!")
 
         # Busca o caminhao no banco de dados
-        caminhao = await db.caminhao.find_one({"_id": caminhao_object_id})
+        caminhao = await db_pesados.caminhao.find_one({"_id": caminhao_object_id})
 
         if not caminhao:
             truck_logger.info(
@@ -314,10 +314,10 @@ class ServiceCaminhao:
             update_data["imagem"] = file_location
 
         # Atualiza o caminhao no banco de dados
-        await db.caminhao.update_one({"_id": caminhao_object_id}, {"$set": update_data})
+        await db_pesados.caminhao.update_one({"_id": caminhao_object_id}, {"$set": update_data})
         
         # Recupera o caminhao atualizado
-        updated_caminhao = await db.caminhao.find_one({"_id": caminhao_object_id})
+        updated_caminhao = await db_pesados.caminhao.find_one({"_id": caminhao_object_id})
         
         truck_logger.info(
             msg=f"Caminhao atualizado!"
@@ -348,7 +348,7 @@ class ServiceCaminhao:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID de caminhao inválido!")
 
         # Busca o caminhao no banco de dados
-        caminhao = await db.caminhao.find_one({"_id": caminhao_object_id})
+        caminhao = await db_pesados.caminhao.find_one({"_id": caminhao_object_id})
 
         if not caminhao:
             truck_logger.info(
@@ -357,7 +357,7 @@ class ServiceCaminhao:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Caminhao não encontrado!")
 
         # Exclui o caminhao usando o ObjectId
-        await db.caminhao.delete_one({"_id": caminhao_object_id})
+        await db_pesados.caminhao.delete_one({"_id": caminhao_object_id})
 
         truck_logger.info(
             msg=f"Caminhao excluído com sucesso!"
