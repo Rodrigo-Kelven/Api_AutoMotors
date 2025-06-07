@@ -20,7 +20,9 @@ Ele permite que os usuários realizem operações como criar, ler, atualizar e e
 - [FastAPI](https://fastapi.tiangolo.com/) - Framework para construção de APIs
 - [SQLAlchemy](https://www.sqlalchemy.org/) - ORM para interagir com o banco de dados
 - [PostGreSQL](https://www.postgresql.org/) - Banco de dados para armazenamento dos dados dos usuarios
+- [PgAdmin](https://hub.docker.com/r/dpage/pgadmin4/) - ce gráfica do banco de dados PostGreSQL
 - [MongoDB](https://hub.docker.com/_/mongo) - Banco de dados NoSQL para armazenamento dos dados dos veiculos
+- [Mongo-Express](https://hub.docker.com/_/mongo-express) - Interface gráfica do banco de dados MongoDB
 - [Redis](https://hub.docker.com/_/redis) - Banco de dados Caching
 - [Pydantic](https://pydantic-docs.helpmanual.io/) - Validação de dados
 - [Docker](https://www.docker.com/) - Conteirização da aplicação
@@ -29,13 +31,8 @@ Ele permite que os usuários realizem operações como criar, ler, atualizar e e
 ## Instalação
 ```bash
   git clone https://github.com/Rodrigo-Kelven/Api_AutoMotors
+  cd Api_AutoMotors
   docker-compose up
-```
-### Atençao a esta parte! Ela é crucial para o funcionamento da API.
-```bash
-  cd Api_AutoMotors/core
-  pip install -r requirements.txt
-  fastapi dev main.py --reload --port 8000
 ```
 
 
