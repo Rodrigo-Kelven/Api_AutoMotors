@@ -74,6 +74,10 @@ class ServicesMoto:
         # Salva o moto no MongoDB
         result = await db_ultra_leves.motos.insert_one(moto.dict())  # Converte o objeto para um dict
         moto_db = await db_ultra_leves.motos.find_one({"_id": result.inserted_id})  # Recupera o moto inserido do banco
+
+        bike_logger.info(
+            msg=f"Veiculo de ID: {result.inserted_id} inserido."
+        )
         
         # Converte para o modelo MotoInfo, incluindo o id
         return MotosInfo.from_mongo(moto_db)

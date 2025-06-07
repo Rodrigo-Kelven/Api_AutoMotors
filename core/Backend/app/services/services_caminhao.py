@@ -82,6 +82,10 @@ class ServiceCaminhao:
         # Salva o caminhao no MongoDB
         result = await db_pesados.caminhao.insert_one(caminhao.dict())  # Converte o objeto para um dict
         caminhao_db = await db_pesados.caminhao.find_one({"_id": result.inserted_id})  # Recupera o carro inserido do banco
+
+        truck_logger.info(
+            msg=f"Veiculo de ID:{result.inserted_id} inserido"
+        )
         
         # Converte para o modelo CaminhaoInfo, incluindo o id
         return CaminhaoInfo.from_mongo(caminhao_db)
