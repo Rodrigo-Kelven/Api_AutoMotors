@@ -24,6 +24,7 @@ Ele permite que os usuários realizem operações como criar, ler, atualizar e e
 - [MongoDB](https://hub.docker.com/_/mongo) - Banco de dados NoSQL para armazenamento dos dados dos veiculos
 - [Mongo-Express](https://hub.docker.com/_/mongo-express) - Interface gráfica do banco de dados MongoDB
 - [Redis](https://hub.docker.com/_/redis) - Banco de dados Caching
+- [Redisinsight](https://hub.docker.com/r/redis/redisinsight) - Interface gráfica do banco de dados Redis
 - [Pydantic](https://pydantic-docs.helpmanual.io/) - Validação de dados
 - [Docker](https://www.docker.com/) - Conteirização da aplicação
 
